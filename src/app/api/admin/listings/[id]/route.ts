@@ -50,7 +50,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
   // Clean up removed images from S3
   if (listingData.images) {
     const removedImages = existing.images.filter((img) => !listingData.images!.includes(img));
-    await Promise.all(removedImages.map(deleteFromS3));
+    await Promise.all(removedImages.map((img) => deleteFromS3(img).catch(() => {})));
   }
 
   const listing = await prisma.$transaction(async (tx) => {
@@ -101,8 +101,8 @@ export async function DELETE(
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  // Delete images from S3
-  await Promise.all(existing.images.map(deleteFromS3));
+  // Delete images from S3 (best-effort, don't block deletion)
+  await Promise.all(existing.images.map((img) => deleteFromS3(img).catch(() => {})));
 
   await prisma.listing.delete({ where: { id } });
 
