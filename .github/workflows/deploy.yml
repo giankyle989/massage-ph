@@ -47,8 +47,9 @@ jobs:
           mkdir -p deploy
           # Standalone server
           cp -r .next/standalone/* deploy/
-          # Static assets
-          cp -r .next/static deploy/.next/static
+          # Static assets (standalone doesn't include these)
+          mkdir -p deploy/.next/static
+          cp -r .next/static/* deploy/.next/static/
           cp -r public deploy/public
           # Prisma files for migrations
           cp -r prisma deploy/prisma
