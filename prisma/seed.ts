@@ -167,12 +167,12 @@ async function main() {
       create: {
         ...listingData,
         services: {
-          create: services.map((s) => ({
-            name: s.name,
-            price: s.price,
-            duration: s.duration,
-            discount: s.discount ?? null,
-            discountType: s.discountType ?? null,
+          create: services.map((s: Record<string, unknown>) => ({
+            name: s.name as string,
+            price: s.price as number,
+            duration: s.duration as number,
+            discount: (s.discount as number) ?? null,
+            discountType: (s.discountType as string) ?? null,
           })),
         },
       },
