@@ -116,7 +116,7 @@ export function ServiceRows({ rows, onChange, error }: ServiceRowsProps) {
                 onChange={(e) =>
                   updateRow(index, 'discountType', e.target.value as ServiceRow['discountType'])
                 }
-                className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="none">None</option>
                 <option value="percentage">Percentage</option>

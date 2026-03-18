@@ -56,7 +56,7 @@ export default async function DashboardPage({
             name="search"
             defaultValue={search || ''}
             placeholder="Search by name, region, or city..."
-            className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
           <button
             type="submit"

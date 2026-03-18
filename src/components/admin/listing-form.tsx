@@ -146,7 +146,7 @@ export function ListingForm({ listing }: ListingFormProps) {
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             required
-            className={`block w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               errors.category ? 'border-red-500' : 'border-gray-300'
             }`}
           >
@@ -171,7 +171,7 @@ export function ListingForm({ listing }: ListingFormProps) {
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
             required
-            className={`block w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
               errors.description ? 'border-red-500' : 'border-gray-300'
             }`}
           />
@@ -207,7 +207,7 @@ export function ListingForm({ listing }: ListingFormProps) {
               value={region}
               onChange={(e) => setRegion(e.target.value)}
               required
-              className={`block w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+              className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
                 errors.region ? 'border-red-500' : 'border-gray-300'
               }`}
             >
@@ -232,7 +232,7 @@ export function ListingForm({ listing }: ListingFormProps) {
               onChange={(e) => setCity(e.target.value)}
               required
               disabled={!region}
-              className={`block w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 ${
+              className={`block w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 ${
                 errors.city ? 'border-red-500' : 'border-gray-300'
               }`}
             >

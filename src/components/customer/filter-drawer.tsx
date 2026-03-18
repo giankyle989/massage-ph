@@ -67,7 +67,7 @@ export function FilterSidebar({ onApply }: { onApply?: () => void }) {
           id="filter-region"
           value={currentRegion}
           onChange={(e) => handleRegionChange(e.target.value)}
-          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All Regions</option>
           {regionsData.regions.map((region) => (
@@ -87,7 +87,7 @@ export function FilterSidebar({ onApply }: { onApply?: () => void }) {
           value={currentCity}
           onChange={(e) => handleCityChange(e.target.value)}
           disabled={!currentRegion}
-          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+          className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <option value="">All Cities</option>
           {cities.map((city) => (
@@ -106,7 +106,7 @@ export function FilterSidebar({ onApply }: { onApply?: () => void }) {
           id="filter-category"
           value={currentCategory}
           onChange={(e) => handleCategoryChange(e.target.value)}
-          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All Categories</option>
           {PREDEFINED_CATEGORIES.map((cat) => (
