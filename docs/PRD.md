@@ -2,13 +2,13 @@
 
 ## MassagePH — Massage Shop Listing Web App
 
-| Field              | Detail                          |
-|--------------------|---------------------------------|
-| **Document Owner** | MassagePH Team                  |
-| **Version**        | 1.0                             |
-| **Created**        | March 18, 2026                  |
-| **Last Updated**   | March 18, 2026                  |
-| **Status**         | Draft                           |
+| Field              | Detail         |
+| ------------------ | -------------- |
+| **Document Owner** | MassagePH Team |
+| **Version**        | 1.0            |
+| **Created**        | March 18, 2026 |
+| **Last Updated**   | March 18, 2026 |
+| **Status**         | Draft          |
 
 ---
 
@@ -32,13 +32,13 @@ Currently, finding massage shops in the Philippines is fragmented. Customers rel
 
 ## 3. Goals & Objectives
 
-| # | Objective                                                                                 | Success Metric                                       |
-|---|-------------------------------------------------------------------------------------------|------------------------------------------------------|
-| 1 | Provide a comprehensive, searchable directory of massage shops in the Philippines         | 100+ listings within 3 months of launch              |
-| 2 | Allow customers to filter and discover shops by region, city, category, and name          | >60% of sessions use at least one filter             |
-| 3 | Give admins full control over listing management via a secure panel                       | Admin can perform all CRUD operations without issues  |
-| 4 | Display rich, detailed listing pages that help customers make informed decisions          | Avg. time on listing detail page > 45 seconds        |
-| 5 | Show shop location on an embedded map so customers can navigate easily                    | Map loads successfully on >95% of detail page views  |
+| #   | Objective                                                                         | Success Metric                                       |
+| --- | --------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| 1   | Provide a comprehensive, searchable directory of massage shops in the Philippines | 100+ listings within 3 months of launch              |
+| 2   | Allow customers to filter and discover shops by region, city, category, and name  | >60% of sessions use at least one filter             |
+| 3   | Give admins full control over listing management via a secure panel               | Admin can perform all CRUD operations without issues |
+| 4   | Display rich, detailed listing pages that help customers make informed decisions  | Avg. time on listing detail page > 45 seconds        |
+| 5   | Show shop location on an embedded map so customers can navigate easily            | Map loads successfully on >95% of detail page views  |
 
 ---
 
@@ -89,7 +89,7 @@ Currently, finding massage shops in the Philippines is fragmented. Customers rel
 #### 6.1.1 Authentication & Authorization
 
 | ID    | Requirement                                                                            | Priority |
-|-------|----------------------------------------------------------------------------------------|----------|
+| ----- | -------------------------------------------------------------------------------------- | -------- |
 | A-001 | Admin can log in with email/username and password.                                     | P0       |
 | A-002 | Admin can log out, which clears the session/token.                                     | P0       |
 | A-003 | All admin pages are protected; unauthenticated users are redirected to the login page. | P0       |
@@ -99,17 +99,17 @@ Currently, finding massage shops in the Philippines is fragmented. Customers rel
 
 #### 6.1.2 Listing Management
 
-| ID    | Requirement                                                                                         | Priority |
-|-------|-----------------------------------------------------------------------------------------------------|----------|
-| A-010 | Admin can view a paginated table/list of all massage shop listings.                                 | P0       |
-| A-011 | Admin can search/filter listings within the admin panel by name, region, or city.                   | P1       |
-| A-012 | Admin can create a new listing by filling out a structured form (see Data Model, Section 7).        | P0       |
-| A-013 | Admin can edit any existing listing. The form is pre-populated with current data.                   | P0       |
-| A-014 | Admin can delete a listing with a confirmation prompt.                                              | P0       |
-| A-015 | Admin can upload one or more images for a listing. Images are stored in cloud storage or on-server. | P0       |
-| A-016 | Admin can add, edit, and remove service items (price, duration, discount) per listing.              | P0       |
-| A-017 | Admin can assign multiple tags to a listing from a predefined or freeform tag input.                | P0       |
-| A-018 | Form validation prevents submission of incomplete or malformed data.                                | P0       |
+| ID    | Requirement                                                                                                 | Priority |
+| ----- | ----------------------------------------------------------------------------------------------------------- | -------- |
+| A-010 | Admin can view a paginated table/list of all massage shop listings.                                         | P0       |
+| A-011 | Admin can search/filter listings within the admin panel by name, region, or city.                           | P1       |
+| A-012 | Admin can create a new listing by filling out a structured form (see Data Model, Section 7).                | P0       |
+| A-013 | Admin can edit any existing listing. The form is pre-populated with current data.                           | P0       |
+| A-014 | Admin can delete a listing with a confirmation prompt.                                                      | P0       |
+| A-015 | Admin can upload one or more images for a listing. Images are stored in cloud storage or on-server.         | P0       |
+| A-016 | Admin can add, edit, and remove service items (price, duration, discount) per listing.                      | P0       |
+| A-017 | Admin can assign multiple tags to a listing from a predefined or freeform tag input.                        | P0       |
+| A-018 | Form validation prevents submission of incomplete or malformed data.                                        | P0       |
 | A-019 | Admin accounts are created via database seed script. No self-registration or admin-created accounts in MVP. | P0       |
 
 ---
@@ -118,32 +118,32 @@ Currently, finding massage shops in the Philippines is fragmented. Customers rel
 
 #### 6.2.1 Listing Browse & Search
 
-| ID    | Requirement                                                                            | Priority |
-|-------|----------------------------------------------------------------------------------------|----------|
+| ID    | Requirement                                                                                                                                         | Priority |
+| ----- | --------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
 | C-001 | Customer can view a public directory of all **active** massage shop listings (card or list layout). Only listings with `is_active: true` are shown. | P0       |
-| C-002 | Customer can filter listings by **region** (e.g., NCR, Region III, Region IV-A).       | P0       |
-| C-003 | Customer can filter listings by **city** (e.g., Quezon City, Makati, Cebu City).       | P0       |
-| C-004 | Customer can filter listings by **category** (e.g., Thai, Chinese, Swedish, Shiatsu).  | P0       |
-| C-005 | Filters can be combined (e.g., NCR + Quezon City + Thai).                              | P0       |
-| C-006 | Customer can search listings by **name** via a search bar.                             | P0       |
-| C-007 | Search and filters work together (e.g., search "Zen" within NCR Thai massage results). | P1       |
-| C-008 | Listings are paginated or use infinite scroll to handle large datasets.                | P1       |
-| C-009 | Each listing card shows: name, category, city, primary image, and starting price.      | P0       |
-| C-010 | When filters return zero results, display an empty state with a message and a "Clear Filters" CTA. | P1       |
-| C-011 | Display a result count above the listing grid (e.g., "Showing 24 results in NCR").     | P1       |
-| C-012 | Listing cards and detail page sections show skeleton loaders while data is loading.    | P1       |
+| C-002 | Customer can filter listings by **region** (e.g., NCR, Region III, Region IV-A).                                                                    | P0       |
+| C-003 | Customer can filter listings by **city** (e.g., Quezon City, Makati, Cebu City).                                                                    | P0       |
+| C-004 | Customer can filter listings by **category** (e.g., Thai, Chinese, Swedish, Shiatsu).                                                               | P0       |
+| C-005 | Filters can be combined (e.g., NCR + Quezon City + Thai).                                                                                           | P0       |
+| C-006 | Customer can search listings by **name** via a search bar.                                                                                          | P0       |
+| C-007 | Search and filters work together (e.g., search "Zen" within NCR Thai massage results).                                                              | P1       |
+| C-008 | Listings are paginated or use infinite scroll to handle large datasets.                                                                             | P1       |
+| C-009 | Each listing card shows: name, category, city, primary image, and starting price.                                                                   | P0       |
+| C-010 | When filters return zero results, display an empty state with a message and a "Clear Filters" CTA.                                                  | P1       |
+| C-011 | Display a result count above the listing grid (e.g., "Showing 24 results in NCR").                                                                  | P1       |
+| C-012 | Listing cards and detail page sections show skeleton loaders while data is loading.                                                                 | P1       |
 
 #### 6.2.2 Listing Detail Page
 
 | ID    | Requirement                                                                                         | Priority |
-|-------|-----------------------------------------------------------------------------------------------------|----------|
+| ----- | --------------------------------------------------------------------------------------------------- | -------- |
 | C-020 | Clicking a listing card opens a detailed page for that shop.                                        | P0       |
 | C-021 | Detail page displays: **name**.                                                                     | P0       |
 | C-022 | Detail page displays: **category** (type of massage).                                               | P0       |
 | C-023 | Detail page displays: **full address** (region, city, street address).                              | P0       |
-| C-024 | Detail page displays: **image(s)** — a hero image or image gallery.                                | P0       |
+| C-024 | Detail page displays: **image(s)** — a hero image or image gallery.                                 | P0       |
 | C-025 | Detail page displays: **description** (includes contact info, special instructions, etc.).          | P0       |
-| C-026 | Detail page displays: **tags** (e.g., "24/7", "Pet Friendly", "Parking Available", "WiFi").        | P0       |
+| C-026 | Detail page displays: **tags** (e.g., "24/7", "Pet Friendly", "Parking Available", "WiFi").         | P0       |
 | C-027 | Detail page displays: **services table** with service name, price, duration, and discount (if any). | P0       |
 | C-028 | Detail page embeds a **Google Map** showing the shop's exact location via coordinates or address.   | P0       |
 | C-029 | Customer can **copy the address** to clipboard with a single click/tap (with visual feedback).      | P0       |
@@ -157,7 +157,7 @@ Currently, finding massage shops in the Philippines is fragmented. Customers rel
 ### 7.1 Listing (Massage Shop)
 
 | Field         | Type              | Required | Description                                                     |
-|---------------|-------------------|----------|-----------------------------------------------------------------|
+| ------------- | ----------------- | -------- | --------------------------------------------------------------- |
 | `id`          | UUID / Auto-incr  | Yes      | Unique identifier.                                              |
 | `name`        | String            | Yes      | Shop name.                                                      |
 | `slug`        | String            | Yes      | URL-friendly version of the name (auto-generated).              |
@@ -168,7 +168,7 @@ Currently, finding massage shops in the Philippines is fragmented. Customers rel
 | `latitude`    | Float             | No       | GPS latitude for map pin (recommended).                         |
 | `longitude`   | Float             | No       | GPS longitude for map pin (recommended).                        |
 | `description` | Text (rich/plain) | Yes      | Detailed description, contact info, operating hours, etc.       |
-| `tags`        | String[]          | No       | Array of tags: "24/7", "Pet Friendly", "Parking", "WiFi", etc. |
+| `tags`        | String[]          | No       | Array of tags: "24/7", "Pet Friendly", "Parking", "WiFi", etc.  |
 | `images`      | String[]          | Yes      | Array of image URLs. First image is the primary/hero image.     |
 | `services`    | Service[]         | Yes      | Array of service offerings (see 7.2).                           |
 | `is_active`   | Boolean           | Yes      | Whether the listing is publicly visible. Default: `true`.       |
@@ -177,20 +177,20 @@ Currently, finding massage shops in the Philippines is fragmented. Customers rel
 
 ### 7.2 Service (Nested under Listing)
 
-| Field           | Type    | Required | Description                                        |
-|-----------------|---------|----------|----------------------------------------------------|
-| `id`            | UUID    | Yes      | Unique identifier.                                 |
-| `name`          | String  | Yes      | Service name (e.g., "Full Body Thai Massage").     |
-| `price`         | Decimal | Yes      | Price in PHP (₱).                                  |
-| `duration`      | Integer | Yes      | Duration in minutes (e.g., 60, 90, 120).           |
+| Field           | Type    | Required | Description                                                                                                                                                                                                 |
+| --------------- | ------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`            | UUID    | Yes      | Unique identifier.                                                                                                                                                                                          |
+| `name`          | String  | Yes      | Service name (e.g., "Full Body Thai Massage").                                                                                                                                                              |
+| `price`         | Decimal | Yes      | Price in PHP (₱).                                                                                                                                                                                           |
+| `duration`      | Integer | Yes      | Duration in minutes (e.g., 60, 90, 120).                                                                                                                                                                    |
 | `discount`      | Decimal | No       | Discount value (nullable). Interpretation depends on `discount_type`: if `"percentage"`, this is the percent off (e.g., `10` = 10% off); if `"fixed"`, this is the PHP amount off (e.g., `100` = ₱100 off). |
-| `discount_type` | Enum    | No       | `"percentage"` or `"fixed"`. Null if no discount.  |
-| `description`   | String  | No       | Optional short description of the service.         |
+| `discount_type` | Enum    | No       | `"percentage"` or `"fixed"`. Null if no discount.                                                                                                                                                           |
+| `description`   | String  | No       | Optional short description of the service.                                                                                                                                                                  |
 
 ### 7.3 Admin User
 
 | Field           | Type     | Required | Description                  |
-|-----------------|----------|----------|------------------------------|
+| --------------- | -------- | -------- | ---------------------------- |
 | `id`            | UUID     | Yes      | Unique identifier.           |
 | `email`         | String   | Yes      | Login email (unique).        |
 | `password_hash` | String   | Yes      | Bcrypt-hashed password.      |
@@ -201,7 +201,7 @@ Currently, finding massage shops in the Philippines is fragmented. Customers rel
 ### 7.4 Philippine Location Reference
 
 | Field    | Type   | Description                               |
-|----------|--------|-------------------------------------------|
+| -------- | ------ | ----------------------------------------- |
 | `region` | String | Region name (e.g., "NCR", "Region IV-A"). |
 | `city`   | String | City or municipality within the region.   |
 
@@ -260,54 +260,54 @@ services/pricing table → Scroll to map section → View embedded Google Map
 
 ## 9. Non-Functional Requirements
 
-| Category           | Requirement                                                                                |
-|--------------------|--------------------------------------------------------------------------------------------|
-| **Performance**    | Listing browse page loads in < 2 seconds on a 4G connection.                               |
-| **Performance**    | Google Map on detail page loads within 3 seconds.                                          |
-| **Security**       | Admin passwords hashed with bcrypt (min 10 salt rounds).                                   |
-| **Security**       | Admin routes protected via JWT or session-based auth with HTTP-only cookies.               |
-| **Security**       | All API endpoints for write operations require authentication.                             |
-| **Security**       | Input sanitization on all forms to prevent XSS and SQL injection.                          |
-| **Scalability**    | System should handle up to 10,000 listings and 50,000 daily page views without degradation.|
-| **Reliability**    | 99.5% uptime target.                                                                      |
+| Category           | Requirement                                                                                                                                                                                                                        |
+| ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Performance**    | Listing browse page loads in < 2 seconds on a 4G connection.                                                                                                                                                                       |
+| **Performance**    | Google Map on detail page loads within 3 seconds.                                                                                                                                                                                  |
+| **Security**       | Admin passwords hashed with bcrypt (min 10 salt rounds).                                                                                                                                                                           |
+| **Security**       | Admin routes protected via JWT or session-based auth with HTTP-only cookies.                                                                                                                                                       |
+| **Security**       | All API endpoints for write operations require authentication.                                                                                                                                                                     |
+| **Security**       | Input sanitization on all forms to prevent XSS and SQL injection.                                                                                                                                                                  |
+| **Scalability**    | System should handle up to 10,000 listings and 50,000 daily page views without degradation.                                                                                                                                        |
+| **Reliability**    | 99.5% uptime target.                                                                                                                                                                                                               |
 | **SEO**            | Customer-facing pages should be server-rendered or statically generated for indexing. Each listing detail page must include dynamic `<title>`, `meta description`, and Open Graph tags (`og:title`, `og:description`, `og:image`). |
-| **Accessibility**  | WCAG 2.1 AA compliance (alt text, keyboard navigation, color contrast).                   |
-| **Responsiveness** | Fully responsive design — mobile-first approach for customer-facing pages.                |
+| **Accessibility**  | WCAG 2.1 AA compliance (alt text, keyboard navigation, color contrast).                                                                                                                                                            |
+| **Responsiveness** | Fully responsive design — mobile-first approach for customer-facing pages.                                                                                                                                                         |
 
 ### 9.1 Error Handling
 
-| Scenario                    | Behavior                                                                  |
-|-----------------------------|---------------------------------------------------------------------------|
-| Invalid listing slug (404)  | Customer-facing 404 page with "Back to listings" link.                   |
-| Server error (500)          | Generic error page with "Try again" and "Back to listings" links.        |
-| API validation error (400)  | Return field-level error messages in `{ error: { field: message } }`.    |
-| Unauthorized admin (401)    | Redirect to login page with a flash message.                             |
-| Form submission failure     | Inline error messages per field; toast notification for server errors.    |
-| Image upload failure        | Toast notification with error message; form remains submittable without the failed image. |
-| Network/timeout error       | Toast notification: "Something went wrong. Please try again."            |
+| Scenario                   | Behavior                                                                                  |
+| -------------------------- | ----------------------------------------------------------------------------------------- |
+| Invalid listing slug (404) | Customer-facing 404 page with "Back to listings" link.                                    |
+| Server error (500)         | Generic error page with "Try again" and "Back to listings" links.                         |
+| API validation error (400) | Return field-level error messages in `{ error: { field: message } }`.                     |
+| Unauthorized admin (401)   | Redirect to login page with a flash message.                                              |
+| Form submission failure    | Inline error messages per field; toast notification for server errors.                    |
+| Image upload failure       | Toast notification with error message; form remains submittable without the failed image. |
+| Network/timeout error      | Toast notification: "Something went wrong. Please try again."                             |
 
 ### 9.2 Loading & Empty States
 
-| Context                     | Behavior                                                                  |
-|-----------------------------|---------------------------------------------------------------------------|
-| Listing cards loading       | Skeleton card placeholders (image + 3 text lines) matching grid layout.  |
-| Detail page loading         | Skeleton placeholders for hero image, info block, services table, map.   |
-| Admin table loading         | Skeleton rows matching table column structure.                            |
+| Context                     | Behavior                                                                             |
+| --------------------------- | ------------------------------------------------------------------------------------ |
+| Listing cards loading       | Skeleton card placeholders (image + 3 text lines) matching grid layout.              |
+| Detail page loading         | Skeleton placeholders for hero image, info block, services table, map.               |
+| Admin table loading         | Skeleton rows matching table column structure.                                       |
 | Filter returns zero results | Empty state: illustration/icon, "No listings found" message, "Clear Filters" button. |
-| Search returns zero results | Empty state: "No listings match '[query]'" with suggestion to broaden search. |
-| Admin dashboard empty       | "No listings yet. Create your first listing." with CTA button.           |
+| Search returns zero results | Empty state: "No listings match '[query]'" with suggestion to broaden search.        |
+| Admin dashboard empty       | "No listings yet. Create your first listing." with CTA button.                       |
 
 ### 9.3 Seed Data Specification
 
 The `prisma/seed.ts` script must create:
 
-| Data                 | Details                                                              |
-|----------------------|----------------------------------------------------------------------|
+| Data                 | Details                                                                                                         |
+| -------------------- | --------------------------------------------------------------------------------------------------------------- |
 | Admin user           | Email: `admin@massageph.com`, Password: `changeme123`, Role: `admin`. Must be changed on first real deployment. |
-| Sample listings      | 5–10 listings across at least 3 regions (NCR, Region IV-A, Region VII) with varied categories. |
-| Services per listing | 2–4 services each with a mix of discounts (percentage, fixed, none). |
-| Tags per listing     | 2–5 tags from the predefined list.                                   |
-| Images               | Use placeholder image URLs (e.g., `https://placehold.co/800x600`). Real S3 uploads not required for seed. |
+| Sample listings      | 5–10 listings across at least 3 regions (NCR, Region IV-A, Region VII) with varied categories.                  |
+| Services per listing | 2–4 services each with a mix of discounts (percentage, fixed, none).                                            |
+| Tags per listing     | 2–5 tags from the predefined list.                                                                              |
+| Images               | Use placeholder image URLs (e.g., `https://placehold.co/800x600`). Real S3 uploads not required for seed.       |
 
 ---
 
@@ -315,29 +315,29 @@ The `prisma/seed.ts` script must create:
 
 > _These are suggestions. Finalize based on team expertise and infrastructure._
 
-| Layer            | Recommendation                                                       |
-|------------------|----------------------------------------------------------------------|
-| **Frontend**     | Next.js 14+ (App Router) — SSR/SSG for SEO, API routes for backend. |
-| **Styling**      | Tailwind CSS — utility-first, responsive-friendly.                   |
-| **Backend/API**  | Next.js API Routes.                                                  |
-| **Database**     | PostgreSQL (relational, strong for structured data and filtering).   |
-| **ORM**          | Prisma — type-safe, works well with Next.js and PostgreSQL.          |
-| **Auth**         | NextAuth.js (Auth.js) — credentials provider, JWT strategy.          |
-| **Image Storage**| AWS S3 (public bucket) + CloudFront CDN.                             |
-| **Maps**         | Google Maps JavaScript API.                                          |
-| **Hosting**      | Vercel (automatic preview deploys on PR, production deploy on merge to `main`). |
-| **Database Host**| AWS RDS (PostgreSQL 16, `db.t3.micro` for MVP).                      |
-| **CDN**          | AWS CloudFront (in front of S3 for image delivery).                  |
-| **CI/CD**        | Vercel built-in deploys + GitHub Actions for lint/test quality gates. |
-| **Search**       | PostgreSQL case-insensitive search on listing name.                  |
-| **Rate Limiting**| In-memory rate limiter middleware.                                    |
+| Layer             | Recommendation                                                                  |
+| ----------------- | ------------------------------------------------------------------------------- |
+| **Frontend**      | Next.js 14+ (App Router) — SSR/SSG for SEO, API routes for backend.             |
+| **Styling**       | Tailwind CSS — utility-first, responsive-friendly.                              |
+| **Backend/API**   | Next.js API Routes.                                                             |
+| **Database**      | PostgreSQL (relational, strong for structured data and filtering).              |
+| **ORM**           | Prisma — type-safe, works well with Next.js and PostgreSQL.                     |
+| **Auth**          | NextAuth.js (Auth.js) — credentials provider, JWT strategy.                     |
+| **Image Storage** | AWS S3 (public bucket) + CloudFront CDN.                                        |
+| **Maps**          | Google Maps JavaScript API.                                                     |
+| **Hosting**       | Vercel (automatic preview deploys on PR, production deploy on merge to `main`). |
+| **Database Host** | AWS RDS (PostgreSQL 16, `db.t3.micro` for MVP).                                 |
+| **CDN**           | AWS CloudFront (in front of S3 for image delivery).                             |
+| **CI/CD**         | Vercel built-in deploys + GitHub Actions for lint/test quality gates.           |
+| **Search**        | PostgreSQL case-insensitive search on listing name.                             |
+| **Rate Limiting** | In-memory rate limiter middleware.                                              |
 
 ---
 
 ## 11. Google Maps Integration
 
 | Aspect       | Detail                                                                                      |
-|--------------|---------------------------------------------------------------------------------------------|
+| ------------ | ------------------------------------------------------------------------------------------- |
 | **API Used** | Google Maps JavaScript API (interactive maps for both customer and admin).                  |
 | **Input**    | Latitude/longitude coordinates stored per listing; fallback to address geocoding.           |
 | **Display**  | Embedded map on the listing detail page showing a pin at the shop's location.               |
@@ -350,14 +350,14 @@ The `prisma/seed.ts` script must create:
 
 The app should include a reference dataset for Philippine regions and their cities/municipalities to power the filter dropdowns. Key regions to support at MVP:
 
-| Region Code | Region Name               | Sample Cities                                    |
-|-------------|---------------------------|--------------------------------------------------|
-| NCR         | National Capital Region   | Quezon City, Manila, Makati, Taguig, Pasig       |
-| Region I    | Ilocos Region             | San Fernando, Laoag, Dagupan, Vigan              |
-| Region III  | Central Luzon             | San Fernando (Pampanga), Angeles, Olongapo       |
-| Region IV-A | CALABARZON               | Antipolo, Calamba, Lucena, Batangas City         |
-| Region VII  | Central Visayas           | Cebu City, Lapu-Lapu, Mandaue, Tagbilaran       |
-| Region XI   | Davao Region              | Davao City, Tagum, Digos, Panabo                 |
+| Region Code | Region Name             | Sample Cities                              |
+| ----------- | ----------------------- | ------------------------------------------ |
+| NCR         | National Capital Region | Quezon City, Manila, Makati, Taguig, Pasig |
+| Region I    | Ilocos Region           | San Fernando, Laoag, Dagupan, Vigan        |
+| Region III  | Central Luzon           | San Fernando (Pampanga), Angeles, Olongapo |
+| Region IV-A | CALABARZON              | Antipolo, Calamba, Lucena, Batangas City   |
+| Region VII  | Central Visayas         | Cebu City, Lapu-Lapu, Mandaue, Tagbilaran  |
+| Region XI   | Davao Region            | Davao City, Tagum, Digos, Panabo           |
 
 > A full list of 17 regions and their cities should be maintained as a static reference file or database seed. The Philippine Standard Geographic Code (PSGC) is the recommended authoritative data source.
 
@@ -448,7 +448,7 @@ The app should include a reference dataset for Philippine regions and their citi
 ## 14. Milestones & Timeline
 
 | Phase   | Milestone                                           | Duration (Est.) |
-|---------|-----------------------------------------------------|-----------------|
+| ------- | --------------------------------------------------- | --------------- |
 | Phase 1 | Project setup, database schema, auth system         | 1–2 weeks       |
 | Phase 2 | Admin CRUD (listings, services, tags, image upload) | 2–3 weeks       |
 | Phase 3 | Customer browse page with search & filters          | 1–2 weeks       |
@@ -462,26 +462,26 @@ The app should include a reference dataset for Philippine regions and their citi
 
 ## 15. Risks & Mitigations
 
-| Risk                                            | Impact | Mitigation                                                             |
-|-------------------------------------------------|--------|------------------------------------------------------------------------|
-| Google Maps API costs exceed budget             | Medium | Use Embed API (free tier) or set billing alerts and usage caps.        |
-| Incomplete or inaccurate listing data at launch | High   | Seed database with verified listings; provide clear admin form UX.     |
-| Image upload performance/storage costs          | Medium | Compress images on upload; use CDN; limit file size (max 5MB).        |
-| Philippine location data is incomplete          | Low    | Use PSGC (Philippine Standard Geographic Code) as authoritative source.|
-| Low initial traffic / discoverability           | Medium | Implement SEO best practices; consider social media marketing.         |
+| Risk                                            | Impact | Mitigation                                                              |
+| ----------------------------------------------- | ------ | ----------------------------------------------------------------------- |
+| Google Maps API costs exceed budget             | Medium | Use Embed API (free tier) or set billing alerts and usage caps.         |
+| Incomplete or inaccurate listing data at launch | High   | Seed database with verified listings; provide clear admin form UX.      |
+| Image upload performance/storage costs          | Medium | Compress images on upload; use CDN; limit file size (max 5MB).          |
+| Philippine location data is incomplete          | Low    | Use PSGC (Philippine Standard Geographic Code) as authoritative source. |
+| Low initial traffic / discoverability           | Medium | Implement SEO best practices; consider social media marketing.          |
 
 ---
 
 ## 16. Open Questions
 
-| #  | Question                                                                                        | Owner   | Status   | Decision |
-|----|-------------------------------------------------------------------------------------------------|---------|----------|----------|
-| 1  | Will there be multiple admin roles with different permission levels, or a single admin role?     | —       | Resolved | Single "admin" role for MVP. Schema keeps `role` field (default: `"admin"`) for future expansion, but no permission differentiation in MVP. Admins are created via seed script only. |
-| 2  | Should images support gallery/carousel, or is a single hero image sufficient for MVP?           | —       | Resolved | Hero image + thumbnail row below. Click thumbnail to swap hero. |
-| 3  | Should the city dropdown dynamically filter based on selected region?                           | —       | Resolved | Yes — city dropdown filters based on selected region. |
-| 4  | Is there a preferred domain name or branding direction?                                         | _[TBD]_ | Open     | Deferred — not a technical decision. |
-| 5  | Will latitude/longitude be entered manually, or should the admin form include a map pin picker? | —       | Resolved | Interactive map pin picker in admin form. |
-| 6  | Should there be an "is_featured" flag for promoted/highlighted listings on the browse page?      | —       | Resolved | Not in MVP. Can be added later as a boolean field. |
+| #   | Question                                                                                        | Owner   | Status   | Decision                                                                                                                                                                             |
+| --- | ----------------------------------------------------------------------------------------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Will there be multiple admin roles with different permission levels, or a single admin role?    | —       | Resolved | Single "admin" role for MVP. Schema keeps `role` field (default: `"admin"`) for future expansion, but no permission differentiation in MVP. Admins are created via seed script only. |
+| 2   | Should images support gallery/carousel, or is a single hero image sufficient for MVP?           | —       | Resolved | Hero image + thumbnail row below. Click thumbnail to swap hero.                                                                                                                      |
+| 3   | Should the city dropdown dynamically filter based on selected region?                           | —       | Resolved | Yes — city dropdown filters based on selected region.                                                                                                                                |
+| 4   | Is there a preferred domain name or branding direction?                                         | _[TBD]_ | Open     | Deferred — not a technical decision.                                                                                                                                                 |
+| 5   | Will latitude/longitude be entered manually, or should the admin form include a map pin picker? | —       | Resolved | Interactive map pin picker in admin form.                                                                                                                                            |
+| 6   | Should there be an "is_featured" flag for promoted/highlighted listings on the browse page?     | —       | Resolved | Not in MVP. Can be added later as a boolean field.                                                                                                                                   |
 
 > Decisions documented in `docs/superpowers/specs/2026-03-18-massageph-design.md`, Section 10.
 
@@ -502,3 +502,43 @@ The app should include a reference dataset for Philippine regions and their citi
 - If `discount_type` is `"percentage"`: display as "10% off" applied to the base price.
 - If `discount_type` is `"fixed"`: display as "₱100 off" deducted from the base price.
 - If no discount: display "—" or hide the discount column for that row.
+
+---
+
+## 18. Future Features (Post-MVP)
+
+The following features are recommended additions after MVP launch, organized by priority tier.
+
+### Tier 1 — High Impact (User Growth)
+
+| #     | Feature                              | Description                                                                                                                                                                                       |
+| ----- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F-001 | **SEO & Meta Tags**                  | Dynamic Open Graph images per listing, structured data using LocalBusiness schema markup, auto-generated `sitemap.xml`, and proper `robots.txt` for Google discoverability.                       |
+| F-002 | **User Reviews & Ratings**           | Allow customers to leave star ratings (1-5) and text reviews on listings. Display average rating on listing cards and detail pages. Requires moderation workflow for admin.                       |
+| F-003 | **WhatsApp / Viber Contact Buttons** | One-tap messaging buttons on listing detail pages linking directly to the business's WhatsApp or Viber number. Critical for the Philippine market where these are primary communication channels. |
+| F-004 | **Favorites / Saved Listings**       | Let users bookmark/save spas without needing an account (localStorage-based). Saved listings accessible from a "My Favorites" page.                                                               |
+
+### Tier 2 — High Impact (Business Value & Monetization)
+
+| #     | Feature                                   | Description                                                                                                                                                                                                  |
+| ----- | ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| F-005 | **Business Claiming**                     | Allow spa owners to claim their listing, verify ownership (via phone/email verification), and manage their own page (update info, images, services). Reduces admin workload and improves data accuracy.      |
+| F-006 | **Online Booking / Appointment Requests** | Simple form on listing detail page that sends a booking request to the business via email or SMS. Not a full booking system — just a structured inquiry with preferred date/time, service, and contact info. |
+| F-007 | **Promoted Listings / Featured Spots**    | Monetization path — businesses pay to appear at the top of search results or in a "Featured" section on the browse page. Requires `is_featured` flag and optional `featured_until` date on listings.         |
+
+### Tier 3 — Medium Impact (Better UX)
+
+| #     | Feature                      | Description                                                                                                                                       |
+| ----- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F-008 | **Map View for Browse Page** | Toggle between list/grid view and map view on the browse page. Map shows pins for all visible listings with popup cards on click.                 |
+| F-009 | **"Near Me" Geolocation**    | Use browser Geolocation API to detect user's position and sort/filter listings by distance. Show distance on listing cards (e.g., "2.3 km away"). |
+| F-010 | **Price Range Filter**       | Filter listings by budget tier on the browse page (e.g., under ₱500, ₱500-1000, ₱1000+). Based on the minimum service price per listing.          |
+| F-011 | **Share Listing**            | Copy link / share to Facebook / share to Twitter buttons on listing detail page. Uses Web Share API on mobile with fallback to copy-to-clipboard. |
+
+### Tier 4 — Medium Impact (Admin & Operations)
+
+| #     | Feature                  | Description                                                                                                                                                                             |
+| ----- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F-012 | **Analytics Dashboard**  | Admin dashboard showing page views per listing, most viewed listings, popular search filters, and traffic trends over time. Can start with simple view counters stored in the database. |
+| F-013 | **Bulk Import / Export** | CSV upload for adding many listings at once. CSV export for backing up or migrating listing data. Useful for onboarding many businesses quickly.                                        |
+| F-014 | **Image Optimization**   | Auto-resize uploaded images to standard dimensions and convert to WebP format on upload for faster page loads. Integrate with Sharp or a similar image processing library.              |
