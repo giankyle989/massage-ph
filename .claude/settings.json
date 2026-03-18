@@ -1,0 +1,9 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "npx ccstatusline@latest"
+  },
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true
+  }
+}
