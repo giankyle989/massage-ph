@@ -1,0 +1,108 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Build Next.js (standalone)
+        run: npm run build
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_S3_REGION: ${{ secrets.AWS_S3_REGION }}
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
+
+      - name: Package build artifacts
+        run: |
+          mkdir -p deploy
+          # Standalone server
+          cp -r .next/standalone/* deploy/
+          # Static assets
+          cp -r .next/static deploy/.next/static
+          cp -r public deploy/public
+          # Prisma files for migrations
+          cp -r prisma deploy/prisma
+          cp prisma.config.ts deploy/prisma.config.ts
+          cp package.json deploy/package.json
+          cp package-lock.json deploy/package-lock.json
+          tar -czf deploy.tar.gz -C deploy .
+
+      - name: Copy to EC2
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: deploy.tar.gz
+          target: /tmp
+
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          command_timeout: 10m
+          script: |
+            set -e
+
+            APP_DIR=/opt/massage-ph
+
+            # Preserve env files
+            cp $APP_DIR/.env /tmp/.env.backup 2>/dev/null || true
+            cp $APP_DIR/.env.local /tmp/.env.local.backup 2>/dev/null || true
+
+            # Extract new build
+            rm -rf $APP_DIR/.next $APP_DIR/server.js $APP_DIR/node_modules
+            tar -xzf /tmp/deploy.tar.gz -C $APP_DIR
+            rm /tmp/deploy.tar.gz
+
+            # Restore env files
+            cp /tmp/.env.backup $APP_DIR/.env 2>/dev/null || true
+            cp /tmp/.env.local.backup $APP_DIR/.env.local 2>/dev/null || true
+
+            cd $APP_DIR
+
+            # Install only production deps needed by standalone
+            npm ci --omit=dev 2>&1 | tail -3
+
+            # Run database migrations
+            npx prisma generate
+            npx prisma migrate deploy
+
+            # Restart or start with PM2
+            if pm2 describe massage-ph > /dev/null 2>&1; then
+              pm2 restart massage-ph
+            else
+              pm2 start server.js --name "massage-ph" --env production
+            fi
+            pm2 save
+
+            echo "Deploy complete!"

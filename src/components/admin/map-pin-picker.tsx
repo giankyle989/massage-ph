@@ -54,35 +54,37 @@ export function MapPinPicker({ latitude, longitude, onChange }: MapPinPickerProp
       version: 'weekly',
     });
 
-    loader.importLibrary('maps').then(async () => {
-      await google.maps.importLibrary('marker');
+    (loader as unknown as { importLibrary: (lib: string) => Promise<unknown> })
+      .importLibrary('maps')
+      .then(async () => {
+        await google.maps.importLibrary('marker');
 
-      if (!mapRef.current) return;
+        if (!mapRef.current) return;
 
-      const hasCoords = latitude !== null && longitude !== null;
-      const center = hasCoords ? { lat: latitude!, lng: longitude! } : MANILA;
-      const zoom = hasCoords ? 15 : 6;
+        const hasCoords = latitude !== null && longitude !== null;
+        const center = hasCoords ? { lat: latitude!, lng: longitude! } : MANILA;
+        const zoom = hasCoords ? 15 : 6;
 
-      const map = new google.maps.Map(mapRef.current, {
-        center,
-        zoom,
-        mapId: 'massage-ph-map',
+        const map = new google.maps.Map(mapRef.current, {
+          center,
+          zoom,
+          mapId: 'massage-ph-map',
+        });
+
+        googleMapRef.current = map;
+
+        if (hasCoords) {
+          placeMarker(center);
+        }
+
+        map.addListener('click', (e: google.maps.MapMouseEvent) => {
+          if (!e.latLng) return;
+          const lat = e.latLng.lat();
+          const lng = e.latLng.lng();
+          placeMarker({ lat, lng });
+          onChangeRef.current(lat, lng);
+        });
       });
-
-      googleMapRef.current = map;
-
-      if (hasCoords) {
-        placeMarker(center);
-      }
-
-      map.addListener('click', (e: google.maps.MapMouseEvent) => {
-        if (!e.latLng) return;
-        const lat = e.latLng.lat();
-        const lng = e.latLng.lng();
-        placeMarker({ lat, lng });
-        onChangeRef.current(lat, lng);
-      });
-    });
 
     return () => {
       markerRef.current = null;
