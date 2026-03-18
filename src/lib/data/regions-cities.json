@@ -1,0 +1,132 @@
+{
+  "regions": [
+    {
+      "code": "NCR",
+      "name": "National Capital Region",
+      "cities": [
+        "Quezon City",
+        "Manila",
+        "Makati",
+        "Taguig",
+        "Pasig",
+        "Mandaluyong",
+        "San Juan",
+        "Pasay",
+        "Parañaque",
+        "Las Piñas",
+        "Muntinlupa",
+        "Marikina",
+        "Caloocan",
+        "Malabon",
+        "Navotas",
+        "Valenzuela"
+      ]
+    },
+    {
+      "code": "Region I",
+      "name": "Ilocos Region",
+      "cities": ["San Fernando", "Laoag", "Dagupan", "Vigan", "Alaminos", "Urdaneta", "San Carlos"]
+    },
+    {
+      "code": "Region III",
+      "name": "Central Luzon",
+      "cities": [
+        "San Fernando",
+        "Angeles",
+        "Olongapo",
+        "Malolos",
+        "Meycauayan",
+        "San Jose del Monte",
+        "Cabanatuan",
+        "Tarlac City"
+      ]
+    },
+    {
+      "code": "Region IV-A",
+      "name": "CALABARZON",
+      "cities": [
+        "Antipolo",
+        "Calamba",
+        "Lucena",
+        "Batangas City",
+        "Lipa",
+        "San Pablo",
+        "Santa Rosa",
+        "Biñan",
+        "Dasmariñas",
+        "Bacoor",
+        "Imus",
+        "General Trias",
+        "Cavite City"
+      ]
+    },
+    {
+      "code": "Region IV-B",
+      "name": "MIMAROPA",
+      "cities": ["Puerto Princesa", "Calapan", "Roxas"]
+    },
+    {
+      "code": "Region V",
+      "name": "Bicol Region",
+      "cities": ["Legazpi", "Naga", "Sorsogon City", "Masbate City", "Iriga", "Tabaco"]
+    },
+    {
+      "code": "Region VI",
+      "name": "Western Visayas",
+      "cities": ["Iloilo City", "Bacolod", "Roxas City", "Kabankalan", "Silay"]
+    },
+    {
+      "code": "Region VII",
+      "name": "Central Visayas",
+      "cities": [
+        "Cebu City",
+        "Lapu-Lapu",
+        "Mandaue",
+        "Tagbilaran",
+        "Dumaguete",
+        "Toledo",
+        "Talisay"
+      ]
+    },
+    {
+      "code": "Region VIII",
+      "name": "Eastern Visayas",
+      "cities": ["Tacloban", "Ormoc", "Calbayog", "Catbalogan"]
+    },
+    {
+      "code": "Region IX",
+      "name": "Zamboanga Peninsula",
+      "cities": ["Zamboanga City", "Pagadian", "Dipolog", "Dapitan"]
+    },
+    {
+      "code": "Region X",
+      "name": "Northern Mindanao",
+      "cities": ["Cagayan de Oro", "Iligan", "Ozamiz", "Malaybalay", "Valencia"]
+    },
+    {
+      "code": "Region XI",
+      "name": "Davao Region",
+      "cities": ["Davao City", "Tagum", "Digos", "Panabo", "Samal"]
+    },
+    {
+      "code": "Region XII",
+      "name": "SOCCSKSARGEN",
+      "cities": ["General Santos", "Koronadal", "Cotabato City", "Kidapawan", "Tacurong"]
+    },
+    {
+      "code": "Region XIII",
+      "name": "Caraga",
+      "cities": ["Butuan", "Surigao City", "Bislig", "Bayugan"]
+    },
+    {
+      "code": "CAR",
+      "name": "Cordillera Administrative Region",
+      "cities": ["Baguio", "Tabuk", "La Trinidad"]
+    },
+    {
+      "code": "BARMM",
+      "name": "Bangsamoro Autonomous Region",
+      "cities": ["Cotabato City", "Marawi", "Lamitan", "Jolo"]
+    }
+  ]
+}
