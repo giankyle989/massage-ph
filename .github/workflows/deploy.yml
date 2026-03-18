@@ -95,7 +95,7 @@ jobs:
             cd $APP_DIR
 
             # Install prisma CLI for migrations (standalone bundles everything else)
-            npm install --no-save prisma@latest @prisma/client@latest 2>&1 | tail -3
+            npm install --no-save prisma@6 @prisma/client@6 2>&1 | tail -3
 
             # Run database migrations
             npx prisma generate
