@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Listing {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  category    String
+  region      String
+  city        String
+  address     String
+  latitude    Float?
+  longitude   Float?
+  description String    @db.Text
+  tags        String[]
+  images      String[]
+  isActive    Boolean   @default(true) @map("is_active")
+  services    Service[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([region])
+  @@index([city])
+  @@index([category])
+  @@index([isActive])
+  @@index([region, city, category, isActive])
+  @@map("listings")
+}
+
+model Service {
+  id           String   @id @default(cuid())
+  name         String
+  price        Decimal  @db.Decimal(10, 2)
+  duration     Int
+  discount     Decimal? @db.Decimal(10, 2)
+  discountType String?  @map("discount_type")
+  description  String?
+  listing      Listing  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  listingId    String   @map("listing_id")
+
+  @@index([listingId])
+  @@map("services")
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("admin_users")
+}
