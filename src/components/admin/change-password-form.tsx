@@ -41,8 +41,8 @@ export function ChangePasswordForm() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.errors) {
-          setErrors(data.errors);
+        if (typeof data.error === 'object') {
+          setErrors(data.error);
         } else {
           setErrors({ currentPassword: data.error || 'Something went wrong' });
         }
