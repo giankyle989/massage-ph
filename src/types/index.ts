@@ -1,8 +1,10 @@
-import { Listing, Service } from '@prisma/client';
+import { Listing } from '@prisma/client';
+import type { SerializedListing, SerializedService } from '@/lib/serialize';
 
-export type ListingWithServices = Listing & {
-  services: Service[];
-};
+/** @deprecated Use SerializedListing when passing data to client components */
+export type ListingWithServices = SerializedListing;
+
+export type { SerializedListing, SerializedService };
 
 export type PublicListing = Omit<ListingWithServices, 'createdAt' | 'updatedAt'>;
 

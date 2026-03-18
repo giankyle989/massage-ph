@@ -8,6 +8,7 @@ import { FilterSidebar, FilterDrawer } from '@/components/customer/filter-drawer
 import { EmptyState } from '@/components/customer/empty-state';
 import { Pagination } from '@/components/ui/pagination';
 import { Prisma } from '@prisma/client';
+import { serializeListings } from '@/lib/serialize';
 
 export const metadata: Metadata = {
   title: 'Browse Massage Listings | MassagePH',
@@ -55,6 +56,7 @@ export default async function BrowsePage({ searchParams }: PageProps) {
     prisma.listing.count({ where }),
   ]);
 
+  const serialized = serializeListings(listings);
   const totalPages = Math.ceil(total / CUSTOMER_PAGE_SIZE);
   const hasFilters = !!(search || region || city || category);
 
@@ -84,14 +86,14 @@ export default async function BrowsePage({ searchParams }: PageProps) {
             {total} {total === 1 ? 'listing' : 'listings'} found
           </p>
 
-          {listings.length === 0 ? (
+          {serialized.length === 0 ? (
             <Suspense>
               <EmptyState hasFilters={hasFilters} />
             </Suspense>
           ) : (
             <>
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {listings.map((listing) => (
+                {serialized.map((listing) => (
                   <ListingCard key={listing.id} listing={listing} />
                 ))}
               </div>

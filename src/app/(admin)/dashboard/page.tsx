@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db';
 import { ADMIN_PAGE_SIZE } from '@/lib/constants';
 import { Pagination } from '@/components/ui/pagination';
 import { AdminListingsTable } from './admin-listings-table';
+import { serializeListings } from '@/lib/serialize';
 
 export default async function DashboardPage({
   searchParams,
@@ -33,6 +34,7 @@ export default async function DashboardPage({
     prisma.listing.count({ where }),
   ]);
 
+  const serialized = serializeListings(listings);
   const totalPages = Math.ceil(total / ADMIN_PAGE_SIZE);
 
   return (
@@ -65,7 +67,7 @@ export default async function DashboardPage({
         </div>
       </form>
 
-      {listings.length === 0 ? (
+      {serialized.length === 0 ? (
         <div className="rounded-lg border border-dashed border-gray-300 p-12 text-center">
           {search ? (
             <p className="text-gray-500">No listings match &apos;{search}&apos;</p>
@@ -84,7 +86,7 @@ export default async function DashboardPage({
       ) : (
         <>
           <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-            <AdminListingsTable listings={listings} />
+            <AdminListingsTable listings={serialized} />
           </div>
           <div className="mt-6">
             <Pagination

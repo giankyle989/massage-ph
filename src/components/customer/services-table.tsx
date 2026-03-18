@@ -1,7 +1,7 @@
-import { Service } from '@prisma/client';
+import type { SerializedService } from '@/lib/serialize';
 
 interface ServicesTableProps {
-  services: Service[];
+  services: SerializedService[];
 }
 
 export function ServicesTable({ services }: ServicesTableProps) {
@@ -40,7 +40,7 @@ export function ServicesTable({ services }: ServicesTableProps) {
   );
 }
 
-function formatDiscount(service: Service): string {
+function formatDiscount(service: SerializedService): string {
   if (!service.discount || !service.discountType) return '\u2014';
   const value = Number(service.discount);
   if (service.discountType === 'percentage') return `${value}% off`;

@@ -6,6 +6,7 @@ import { ImageGallery } from '@/components/customer/image-gallery';
 import { ServicesTable } from '@/components/customer/services-table';
 import { CopyAddress } from '@/components/customer/copy-address';
 import { MapEmbed } from '@/components/customer/map-embed';
+import { serializeListing } from '@/lib/serialize';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -39,11 +40,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ListingDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const listing = await getListing(slug);
+  const rawListing = await getListing(slug);
 
-  if (!listing) {
+  if (!rawListing) {
     notFound();
   }
+
+  const listing = serializeListing(rawListing);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
