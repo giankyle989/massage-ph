@@ -1,8 +1,18 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import { downloadAndUploadImages } from './seed-images';
+import { downloadBusinessImages, BusinessImages } from './seed-images';
 
 const prisma = new PrismaClient();
+
+function getImages(images: BusinessImages, slug: string, fallback: BusinessImages): string[] {
+  const urls = images[slug];
+  if (urls && urls.length > 0) return urls;
+  // Fallback: grab any available images
+  for (const imgs of Object.values(fallback)) {
+    if (imgs.length > 0) return [imgs[0]];
+  }
+  return ['https://placehold.co/800x600?text=No+Image'];
+}
 
 async function main() {
   // === RESET ALL DATA ===
@@ -25,54 +35,74 @@ async function main() {
   });
   console.log('Admin user ready.');
 
-  // === UPLOAD IMAGES TO S3 ===
-  const images = await downloadAndUploadImages();
-  if (images.length < 10) {
-    throw new Error(`Only got ${images.length} images, need at least 10. Check network/S3 config.`);
-  }
+  // === FETCH REAL BUSINESS IMAGES FROM GOOGLE PLACES ===
+  const images = await downloadBusinessImages();
 
-  let imgIdx = 0;
-  function nextImages(count: number): string[] {
-    const result: string[] = [];
-    for (let i = 0; i < count; i++) {
-      result.push(images[imgIdx % images.length]);
-      imgIdx++;
-    }
-    return result;
-  }
-
-  // === CREATE LISTINGS — Real Philippine massage/spa businesses ===
+  // === CREATE LISTINGS WITH VERIFIED DATA ===
   const listings = [
-    // --- NCR ---
+    // --- BREEZE ORIENTAL SPA BGC ---
     {
-      name: 'Breeze Oriental Spa & Massage',
+      name: 'Breeze Oriental Spa & Massage - BGC',
       slug: 'breeze-oriental-spa-bgc',
       category: 'Chinese Massage',
       region: 'NCR',
       city: 'Taguig',
-      address: 'G/F Ore Central, 9th Ave. cor. 31st St., Bonifacio Global City, Taguig',
+      address: 'G/F Orē Central, 9th Ave. cor. 31st St., Bonifacio Global City, Taguig 1634',
       latitude: 14.5509,
       longitude: 121.0487,
       description:
-        'Breeze Oriental Spa brings authentic Chinese massage traditions to the heart of BGC. Specializing in Tui Na, acupressure, and traditional Chinese cupping therapy, our trained therapists provide relief from chronic pain and stress. The modern, minimalist interiors offer a calming retreat from the busy city. Walk-ins welcome. Open daily 10AM-12MN.',
-      tags: ['Parking Available', 'Credit Card Accepted', 'WiFi Available', 'Walk-In Welcome'],
-      images: nextImages(3),
+        'Breeze Oriental Spa provides authentic Chinese massage in a luxurious, healing environment in BGC. Therapists undergo 3-6 months of extensive training. The BGC branch has 17 fully equipped rooms for each massage category. Open Mon-Thu & Sun 11AM-1AM, Fri-Sat 11AM-2AM. Contact: 0917-867-6699.',
+      tags: [
+        'Parking Available',
+        'Credit Card Accepted',
+        'WiFi Available',
+        'Walk-In Welcome',
+        'Couple Massage',
+      ],
+      images: getImages(images, 'breeze-oriental-spa-bgc', images),
       isActive: true,
       services: [
-        { name: 'Tui Na Full Body Massage', price: 800, duration: 60 },
-        {
-          name: 'Acupressure Therapy',
-          price: 1000,
-          duration: 90,
-          discount: 10,
-          discountType: 'percentage',
-        },
-        { name: 'Chinese Cupping (Ventosa)', price: 600, duration: 45 },
-        { name: 'Foot Reflexology', price: 450, duration: 30 },
+        { name: 'Oriental Foot Massage', price: 1350, duration: 60 },
+        { name: 'Breeze Foot Massage', price: 1850, duration: 90 },
+        { name: 'Pressure Points Body Massage', price: 1500, duration: 60 },
+        { name: 'Shiatsu Body Massage', price: 2100, duration: 90 },
+        { name: 'Thai Body Massage', price: 2600, duration: 120 },
+        { name: 'Revitalize Oil Therapy', price: 1800, duration: 60 },
+        { name: 'Wellness Oil Therapy', price: 2300, duration: 90 },
+        { name: 'Detoxify Oil Therapy', price: 3400, duration: 120 },
+        { name: 'Neck & Shoulder Treatment', price: 900, duration: 30 },
+        { name: 'Cupping / Ventosa', price: 800, duration: 20 },
       ],
     },
+    // --- BREEZE ORIENTAL SPA MAKATI ---
     {
-      name: 'The Mandara Spa BGC',
+      name: 'Breeze Oriental Spa & Massage - Makati',
+      slug: 'breeze-oriental-spa-makati',
+      category: 'Chinese Massage',
+      region: 'NCR',
+      city: 'Makati',
+      address:
+        'G/F Skyland Plaza Tower B, Malugay St. cor. Talisay St., San Antonio Village, Makati 1210',
+      latitude: 14.56,
+      longitude: 121.0192,
+      description:
+        "The Makati branch of Breeze Oriental Spa brings the same authentic Chinese massage experience to Makati's San Antonio Village. Featuring a holistic approach to wellness with trained therapists specializing in Tui Na, acupressure, and oil therapies. Open Mon-Thu & Sun 11AM-1AM, Fri-Sat 11AM-2AM. Contact: 0917-846-8866.",
+      tags: ['Parking Available', 'Credit Card Accepted', 'WiFi Available', 'Walk-In Welcome'],
+      images: getImages(images, 'breeze-oriental-spa-makati', images),
+      isActive: true,
+      services: [
+        { name: 'Oriental Foot Massage', price: 1350, duration: 60 },
+        { name: 'Pressure Points Body Massage', price: 1500, duration: 60 },
+        { name: 'Shiatsu Body Massage', price: 2100, duration: 90 },
+        { name: 'Revitalize Oil Therapy', price: 1800, duration: 60 },
+        { name: 'Head & Neck Treatment', price: 1200, duration: 30 },
+        { name: 'Back Scraping (Gua Sha)', price: 800, duration: 20 },
+        { name: 'Foot Scrub', price: 500, duration: 20 },
+      ],
+    },
+    // --- THE MANDARA SPA BGC ---
+    {
+      name: 'The Mandara Spa - BGC 3rd Ave',
       slug: 'the-mandara-spa-bgc',
       category: 'Combination / Multi-style',
       region: 'NCR',
@@ -81,25 +111,27 @@ async function main() {
       latitude: 14.5535,
       longitude: 121.0502,
       description:
-        'The Mandara Spa offers personalized, luxurious treatments from head to toe at value-for-money rates. Our signature Mandara massage blends Swedish long strokes with Balinese techniques for total relaxation. Private treatment rooms, complimentary herbal tea, and a tranquil ambience await. By appointment preferred. Open daily 11AM-11PM.',
+        'A boutique spa at the heart of BGC featuring wall arts and decor made of indigenous Filipino materials such as capiz shells, showcasing genuine warmth of Filipino hospitality. Private treatment rooms with soft lighting, calming music, and soothing aromas. Open Mon-Sun 12NN-11PM. Contact: 0915-844-3003 / (02) 8869-9910.',
       tags: ['By Appointment Only', 'Credit Card Accepted', 'Couple Massage', 'WiFi Available'],
-      images: nextImages(3),
+      images: getImages(images, 'the-mandara-spa-bgc', images),
       isActive: true,
       services: [
         { name: 'Mandara Signature Massage (75 min)', price: 1850, duration: 75 },
         { name: 'Mandara Signature Massage (90 min)', price: 2250, duration: 90 },
         { name: 'Mandara Signature Massage (120 min)', price: 2850, duration: 120 },
-        {
-          name: 'Couples Relaxation Package',
-          price: 3500,
-          duration: 90,
-          discount: 500,
-          discountType: 'fixed',
-        },
+        { name: 'Swedish Aromatherapy (60 min)', price: 1350, duration: 60 },
+        { name: 'Shiatsu Dry Massage (60 min)', price: 1350, duration: 60 },
+        { name: 'Hot Stone Massage (90 min)', price: 2400, duration: 90 },
+        { name: 'Four Hands Therapy (60 min)', price: 2500, duration: 60 },
+        { name: 'Ventosa Cupping with Hilot (90 min)', price: 2550, duration: 90 },
+        { name: 'Xiamen Foot Massage (60 min)', price: 1350, duration: 60 },
+        { name: 'Signature Foot Spa with Pedicure', price: 2150, duration: 75 },
+        { name: 'Ultimate Mandara Experience (3hr 15min)', price: 5800, duration: 195 },
       ],
     },
+    // --- CHANG THAI MASSAGE POBLACION ---
     {
-      name: 'Chang Thai Massage Poblacion',
+      name: 'Chang Thai Massage - Poblacion',
       slug: 'chang-thai-massage-poblacion',
       category: 'Thai Massage',
       region: 'NCR',
@@ -108,9 +140,9 @@ async function main() {
       latitude: 14.5636,
       longitude: 121.0321,
       description:
-        'Chang Thai brings the authentic Wat Pho massage experience to the vibrant streets of Poblacion, Makati. With 6 branches across Metro Manila, our Thai-trained therapists deliver traditional dry massage focusing on pressure points and body stretching. A favorite after-work spot for professionals in the Makati CBD. Open 12NN-2AM daily.',
+        'Chang Thai has 6 branches across Metro Manila, and the Poblacion branch is a favorite among Makati nightlife-goers. Specializing in Wat Pho traditional Thai massage — a dry massage focusing on pressure points and body stretching. Open 12NN-2AM daily.',
       tags: ['Walk-In Welcome', 'GCash Accepted', 'Male Therapist', 'Female Therapist'],
-      images: nextImages(2),
+      images: getImages(images, 'chang-thai-massage-poblacion', images),
       isActive: true,
       services: [
         { name: 'Traditional Thai Massage', price: 500, duration: 60 },
@@ -119,157 +151,139 @@ async function main() {
         { name: 'Twin Thai Massage (2 persons)', price: 1500, duration: 60 },
       ],
     },
-    {
-      name: 'Tonton Prestige Massage Legazpi',
-      slug: 'tonton-prestige-massage-legazpi',
-      category: 'Thai Massage',
-      region: 'NCR',
-      city: 'Makati',
-      address: '126 Legazpi St., Legazpi Village, Makati City',
-      latitude: 14.5553,
-      longitude: 121.0198,
-      description:
-        'Tonton Prestige specializes in Wat Pho traditional Thai massage, a dry massage focusing on pressure points and body stretching techniques. With multiple branches in Makati, we are a trusted name for deep relaxation and pain relief. Our therapists are trained in Bangkok and bring years of expertise. Open daily 11AM-1AM.',
-      tags: ['Walk-In Welcome', 'Parking Available', 'Credit Card Accepted', 'GCash Accepted'],
-      images: nextImages(2),
-      isActive: true,
-      services: [
-        { name: 'Wat Pho Thai Massage', price: 600, duration: 60 },
-        { name: 'Thai Aromatherapy Massage', price: 800, duration: 60 },
-        { name: 'Back & Shoulder Relief', price: 400, duration: 30 },
-        { name: 'Foot Reflexology', price: 350, duration: 30 },
-      ],
-    },
-    {
-      name: 'Asian Massage Makati',
-      slug: 'asian-massage-makati',
-      category: 'Combination / Multi-style',
-      region: 'NCR',
-      city: 'Makati',
-      address: 'Goldrich Mansion Building, South Superhighway, Makati City',
-      latitude: 14.5437,
-      longitude: 121.0088,
-      description:
-        'Asian Massage is a 24/7 wellness center offering a wide variety of Asian massage techniques. From Philippine traditional Hilot to Japanese Shiatsu, Korean Seomyeong, Thai massage, and more — we have something for everyone. We also offer Ventosa cupping therapy, lymphatic drainage, and gentle baby massage. A one-stop shop for holistic healing.',
-      tags: ['24/7', 'Walk-In Welcome', 'Home Service', 'GCash Accepted'],
-      images: nextImages(3),
-      isActive: true,
-      services: [
-        { name: 'Hilot Filipino Massage', price: 450, duration: 60 },
-        { name: 'Shiatsu Massage', price: 550, duration: 60 },
-        { name: 'Thai Massage', price: 500, duration: 60 },
-        { name: 'Hot Stone Therapy', price: 700, duration: 60 },
-        { name: 'Ventosa Cupping', price: 400, duration: 30 },
-        { name: 'Baby Massage', price: 350, duration: 30 },
-      ],
-    },
+    // --- CELEBRITY SPIRAL SPA QC ---
     {
       name: 'Celebrity Spiral Spa',
       slug: 'celebrity-spiral-spa-qc',
       category: 'Combination / Multi-style',
       region: 'NCR',
       city: 'Quezon City',
-      address: 'Future Point Plaza 2, G/F 115 Mother Ignacia Ave., South Triangle, Quezon City',
+      address:
+        'Future Point Plaza 2, G/F 115 Mother Ignacia Ave., South Triangle, Quezon City 1103',
       latitude: 14.6334,
       longitude: 121.0378,
       description:
-        'Celebrity Spiral Spa is a neighborhood favorite near Timog Avenue offering a wide range of massage and wellness services at affordable prices. Our clean, air-conditioned rooms and friendly staff make every visit a treat. Popular with couples looking for a budget-friendly spa date. Open daily 10AM-10PM.',
+        'Celebrity Spiral Spa is a neighborhood favorite near Timog Avenue. VIP rooms with private en-suite showers are available. Known for affordable couples massage and a wide range of treatments. Open daily 10AM-10PM. Contact: (02) 8374-7786 / 0949-885-6273.',
       tags: ['Walk-In Welcome', 'Couple Massage', 'GCash Accepted', 'Senior Discount'],
-      images: nextImages(2),
+      images: getImages(images, 'celebrity-spiral-spa-qc', images),
       isActive: true,
       services: [
-        { name: 'Swedish Massage', price: 400, duration: 60 },
-        { name: 'Shiatsu Massage', price: 400, duration: 60 },
+        { name: 'Swedish Massage (60 min)', price: 350, duration: 60 },
+        { name: 'Swedish Massage (90 min)', price: 550, duration: 90 },
+        { name: 'Shiatsu Massage (60 min)', price: 600, duration: 60 },
+        { name: 'Shiatsu Massage (90 min)', price: 900, duration: 90 },
+        { name: 'Sports Massage', price: 550, duration: 60 },
+        { name: 'Hilot Traditional Filipino (60 min)', price: 450, duration: 60 },
         { name: 'Hot Stone Massage', price: 600, duration: 60 },
-        { name: 'Hilot with Ventosa', price: 700, duration: 60 },
         { name: 'Thai Massage w/ Herbal Compress', price: 600, duration: 60 },
+        { name: 'Prenatal Massage', price: 450, duration: 60 },
+        { name: 'Ventosa (Fire Cupping)', price: 600, duration: 60 },
         { name: 'Couples Massage (per person)', price: 350, duration: 60 },
+        { name: 'Scalp Massage', price: 300, duration: 30 },
       ],
     },
+    // --- THAI ROYALE SPA TOMAS MORATO ---
     {
-      name: 'Thai Royale Spa Tomas Morato',
+      name: 'Thai Royale Spa - Tomas Morato',
       slug: 'thai-royale-spa-tomas-morato',
       category: 'Thai Massage',
       region: 'NCR',
       city: 'Quezon City',
-      address: 'Tomas Morato Ave., South Triangle, Quezon City',
+      address: 'Unit 202 & 203, 2nd Floor, Condominium South Insula, 61 Timog Ave., Quezon City',
       latitude: 14.6355,
       longitude: 121.0345,
       description:
-        'Thai Royale Spa is a family-oriented spa in the heart of the Tomas Morato entertainment district. We offer authentic Thai massage in a clean, relaxing environment. Our spacious rooms are perfect for groups and families looking for affordable wellness treatments. Open daily 12NN-12MN.',
-      tags: ['Walk-In Welcome', 'Parking Available', 'WiFi Available', 'GCash Accepted'],
-      images: nextImages(2),
+        'A family-oriented spa in the entertainment center of Quezon City. Franchised from EKG Thai Royale Spa Inc. and founded in 2024. Offers authentic Thai massage, Swedish, aromatherapy, combination massage, and chiropractic services. Open 24 hours Mon-Sun. Contact: 0939-932-8424 / 0917-308-8424.',
+      tags: ['24/7', 'Walk-In Welcome', 'Parking Available', 'GCash Accepted'],
+      images: getImages(images, 'thai-royale-spa-tomas-morato', images),
       isActive: true,
       services: [
-        { name: 'Royal Thai Massage', price: 500, duration: 60 },
-        { name: 'Thai Oil Massage', price: 650, duration: 60 },
-        { name: 'Thai Foot Massage', price: 350, duration: 30 },
-        {
-          name: 'Combination Massage',
-          price: 750,
-          duration: 90,
-          discount: 50,
-          discountType: 'fixed',
-        },
+        { name: 'Thai Massage', price: 500, duration: 60 },
+        { name: 'Swedish Massage', price: 450, duration: 60 },
+        { name: 'Aromatherapy Massage', price: 600, duration: 60 },
+        { name: 'Combination Massage', price: 550, duration: 60 },
+        { name: 'Back Massage', price: 300, duration: 30 },
+        { name: 'Foot Massage', price: 300, duration: 30 },
+        { name: 'Body Scrub', price: 400, duration: 30 },
       ],
     },
+    // --- BIG APPLE EXPRESS SPA BGC ---
     {
-      name: 'BlueWater Day Spa Makati',
-      slug: 'bluewater-day-spa-makati',
-      category: 'Swedish Massage',
+      name: 'Big Apple Express Spa - Forbes Town',
+      slug: 'big-apple-express-spa-bgc',
+      category: 'Combination / Multi-style',
       region: 'NCR',
-      city: 'Makati',
-      address: '7835 Makati Ave., Makati City',
-      latitude: 14.5583,
-      longitude: 121.0165,
+      city: 'Taguig',
+      address: 'F103, Forbes Town Center, Burgos Circle cor. Rizal Drive, BGC, Taguig',
+      latitude: 14.552,
+      longitude: 121.0465,
       description:
-        'BlueWater Day Spa is known for its specialized massages for kids and pregnant women. Baby massage starts from 6 months old. Our gentle, experienced therapists make sure every guest — from infants to seniors — feels cared for. A family-friendly spa in the heart of Makati. Open daily 10AM-10PM.',
-      tags: [
-        'Walk-In Welcome',
-        'Credit Card Accepted',
-        'Wheelchair Accessible',
-        'Female Therapist',
-      ],
-      images: nextImages(2),
+        'Big Apple Express Spa combines the ancient art of massage with modern business systems. Known for affordable express massages starting at just ₱200. Located in Forbes Town Center BGC with a second branch at Market! Market! An innovative concept for quick relaxation during a busy day.',
+      tags: ['Walk-In Welcome', 'Credit Card Accepted', 'GCash Accepted', 'WiFi Available'],
+      images: getImages(images, 'big-apple-express-spa-bgc', images),
       isActive: true,
       services: [
-        { name: 'Classic Swedish Massage', price: 600, duration: 60 },
-        { name: 'Prenatal Massage', price: 700, duration: 60 },
-        { name: 'Baby Massage (6mo-7yrs)', price: 550, duration: 60 },
-        { name: 'Deep Tissue Massage', price: 750, duration: 60 },
+        { name: 'Make Your Own Massage', price: 200, duration: 15 },
+        { name: 'NYC Express Massage', price: 250, duration: 30 },
+        { name: 'Manhattan Massage', price: 700, duration: 45 },
+        { name: 'Balinese Deluxe', price: 1000, duration: 60 },
+        { name: 'Brazilian Deluxe (Deep Tissue)', price: 1200, duration: 60 },
+        { name: 'Quick Relief Foot Massage', price: 400, duration: 30 },
+        { name: 'Sole Revival Foot Massage', price: 800, duration: 60 },
+        { name: 'Deep Tissue Sole Revival', price: 950, duration: 60 },
+        { name: 'GlutaWhite Body Treatment', price: 900, duration: 45 },
       ],
     },
-    // --- CEBU ---
+    // --- CEDAR WELLNESS SPA QC ---
     {
-      name: 'Tree Shade Spa Cebu',
+      name: 'Cedar Wellness Spa',
+      slug: 'cedar-wellness-spa-qc',
+      category: 'Combination / Multi-style',
+      region: 'NCR',
+      city: 'Quezon City',
+      address: '3F, 70 Holy Spirit Drive, Brgy. Holy Spirit, Quezon City 1127',
+      latitude: 14.6815,
+      longitude: 121.0602,
+      description:
+        'Planned and designed in Singapore, constructed by Filipinos. Cedar Wellness Spa follows the Singaporean massage technique. Features private soundproofed rooms with Asian home-like interior, hot showers in each room, a tea center, and automatic reclining chairs in the foot massage hall. Contact: 0967-048-3714.',
+      tags: ['By Appointment Only', 'Parking Available', 'WiFi Available', 'Couple Massage'],
+      images: getImages(images, 'cedar-wellness-spa-qc', images),
+      isActive: true,
+      services: [
+        { name: 'Singaporean Signature Massage', price: 700, duration: 60 },
+        { name: 'Full Body Massage', price: 600, duration: 60 },
+        { name: 'Foot Reflexology', price: 400, duration: 45 },
+        { name: 'Combination Massage', price: 800, duration: 90 },
+      ],
+    },
+    // --- TREE SHADE SPA CEBU ---
+    {
+      name: 'Tree Shade Spa - Lahug',
       slug: 'tree-shade-spa-cebu',
       category: 'Combination / Multi-style',
       region: 'Region VII',
       city: 'Cebu City',
-      address: 'Archbishop Reyes Ave., Cebu City',
-      latitude: 10.3175,
-      longitude: 123.8917,
+      address: 'Salinas Drive, Lahug, Cebu City',
+      latitude: 10.3283,
+      longitude: 123.8964,
       description:
-        "Tree Shade Spa is one of Cebu City's most popular wellness destinations, offering a wide range of services from Swedish and Shiatsu to Thai massage and hot stone treatments. Known for its lush, garden-like interiors and affordable prices, it's a favorite among locals and tourists alike. Body scrubs and facial treatments also available. Open daily 10AM-12MN.",
-      tags: ['Walk-In Welcome', 'Parking Available', 'Couple Massage', 'GCash Accepted'],
-      images: nextImages(3),
+        "One of Cebu's most popular spa chains, open 24/7 with branches across the city. Tree Shade offers premium massages by veteran therapists, aromatherapy with six essential oil options, and even massages for children aged 2-12. Also houses TREE NAIL salon. Price range: ₱350-₱900. Contact: 0917-638-8910.",
+      tags: ['24/7', 'Walk-In Welcome', 'Parking Available', 'GCash Accepted'],
+      images: getImages(images, 'tree-shade-spa-cebu', images),
       isActive: true,
       services: [
         { name: 'Swedish Massage', price: 400, duration: 60 },
-        { name: 'Shiatsu Massage', price: 400, duration: 60 },
-        { name: 'Thai Massage', price: 450, duration: 60 },
-        { name: 'Hot Stone Massage', price: 700, duration: 60 },
-        {
-          name: 'Body Scrub + Massage Combo',
-          price: 900,
-          duration: 90,
-          discount: 100,
-          discountType: 'fixed',
-        },
+        { name: 'Aromatherapy Massage', price: 550, duration: 60 },
+        { name: 'Thai Massage', price: 500, duration: 60 },
+        { name: 'Premium Massage (Veteran Therapist)', price: 700, duration: 60 },
+        { name: 'Body Scrub', price: 500, duration: 45 },
+        { name: 'Body Wrap', price: 600, duration: 45 },
+        { name: 'Kids Massage (ages 2-12)', price: 350, duration: 30 },
       ],
     },
+    // --- BODY & SOLE CEBU ---
     {
-      name: 'Body & Sole Spa Cebu',
+      name: 'Body & Sole Spa - Ayala Center Cebu',
       slug: 'body-and-sole-spa-cebu',
       category: 'Reflexology',
       region: 'Region VII',
@@ -278,9 +292,9 @@ async function main() {
       latitude: 10.3189,
       longitude: 123.905,
       description:
-        'Body & Sole is one of the most accessible and affordable spa chains in Cebu, with multiple branches across the city. Known for excellent foot reflexology and full-body massages at wallet-friendly prices. Clean facilities, professional therapists, and a loyal following among Cebuano regulars. Open daily 10AM-10PM.',
+        'One of the most accessible and affordable spa chains in Cebu with multiple branches across the city. Known for excellent foot reflexology and full-body massages at wallet-friendly prices (₱250-₱700). Clean facilities and professional therapists with a loyal following among Cebuano regulars. Open daily 10AM-10PM.',
       tags: ['Walk-In Welcome', 'WiFi Available', 'Credit Card Accepted', 'Student Discount'],
-      images: nextImages(2),
+      images: getImages(images, 'body-and-sole-spa-cebu', images),
       isActive: true,
       services: [
         { name: 'Foot Reflexology', price: 300, duration: 60 },
@@ -289,19 +303,43 @@ async function main() {
         { name: 'Back & Shoulder Massage', price: 250, duration: 30 },
       ],
     },
+    // --- NUAT THAI CEBU ---
+    {
+      name: 'Nuat Thai - Lahug Cebu',
+      slug: 'nuat-thai-cebu',
+      category: 'Thai Massage',
+      region: 'Region VII',
+      city: 'Cebu City',
+      address: 'Salinas Drive, Lahug, Cebu City',
+      latitude: 10.3279,
+      longitude: 123.8959,
+      description:
+        'Nuat Thai is one of the largest massage franchises in the Philippines, offering consistent quality across all its locations. The Cebu branch on Salinas Drive is popular with both locals and language school students. Known for affordable Thai-style and Swedish massages. Main office: PCF Bldg. No. 20, M. Zosa St., Capitol Site, Cebu. Tel: 032-234-9302.',
+      tags: ['Walk-In Welcome', 'GCash Accepted', 'Student Discount', 'Female Therapist'],
+      images: getImages(images, 'nuat-thai-cebu', images),
+      isActive: true,
+      services: [
+        { name: 'Dry Thai Massage', price: 250, duration: 60 },
+        { name: 'Foot Reflexology', price: 250, duration: 60 },
+        { name: 'Swedish Massage', price: 350, duration: 60 },
+        { name: 'Aromatherapy Massage', price: 450, duration: 60 },
+        { name: 'Combination Massage (90 min)', price: 500, duration: 90 },
+      ],
+    },
+    // --- NATURE WELLNESS LAPU-LAPU ---
     {
       name: 'Nature Wellness Massage & Spa',
       slug: 'nature-wellness-lapu-lapu',
       category: 'Swedish Massage',
       region: 'Region VII',
       city: 'Lapu-Lapu City',
-      address: 'M.L. Quezon National Highway, Lapu-Lapu City, Cebu',
+      address: 'Augusto Building, 2 Casanta Soong, Lapu-Lapu City, Cebu',
       latitude: 10.3103,
       longitude: 123.9494,
       description:
-        'Nature Wellness Massage & Spa offers a serene escape near the Mactan resort area. Our treatments use natural, locally-sourced ingredients including virgin coconut oil and calamansi extracts. A favorite among tourists visiting Mactan Island. Open daily 9AM-11PM.',
-      tags: ['Parking Available', 'Walk-In Welcome', 'Couple Massage', 'GCash Accepted'],
-      images: nextImages(2),
+        'Combining German standards and Filipino hospitality since 2016. Therapists trained from a Frankfurt, Germany academy using German products and materials. Offers packages for bridal showers, couples, and groups. Gift vouchers and home/hotel service available. Walk-ins welcome.',
+      tags: ['Walk-In Welcome', 'Home Service', 'Couple Massage', 'GCash Accepted'],
+      images: getImages(images, 'nature-wellness-lapu-lapu', images),
       isActive: true,
       services: [
         { name: 'Swedish Massage', price: 500, duration: 60 },
@@ -313,28 +351,28 @@ async function main() {
           discount: 10,
           discountType: 'percentage',
         },
-        { name: 'Calamansi Body Scrub + Massage', price: 800, duration: 90 },
+        { name: 'Body Scrub + Massage', price: 800, duration: 90 },
       ],
     },
-    // --- DAVAO ---
+    // --- DUSIT DEVARANA SPA DAVAO ---
     {
-      name: 'Dusit Thani Devarana Spa Davao',
+      name: 'Devarana Spa at Dusit Thani Davao',
       slug: 'dusit-devarana-spa-davao',
       category: 'Combination / Multi-style',
       region: 'Region XI',
       city: 'Davao City',
-      address: 'Dusit Thani Residence, Puso ng Bayan, General Luna St., Davao City',
+      address: 'Dusit Thani Residence, General Luna St., Davao City',
       latitude: 7.0667,
       longitude: 125.6095,
       description:
-        'Devarana Spa at Dusit Thani Residence Davao offers a luxurious wellness experience inspired by Thai hospitality. Our treatments feature premium products and skilled therapists trained in traditional Thai and Western techniques. The spa includes private treatment suites, a relaxation lounge, and steam facilities. By appointment. Open daily 10AM-10PM.',
+        'Devarana Spa at the 5-star Dusit Thani Residence Davao offers luxury wellness inspired by Thai hospitality. Premium products and therapists trained in traditional Thai and Western techniques. Private treatment suites, relaxation lounge, and steam facilities. Signature body scrub uses sweet potatoes, taro, oatmeal, and lavender essential oil. By appointment. Open daily 10AM-10PM.',
       tags: ['By Appointment Only', 'Parking Available', 'Credit Card Accepted', 'Couple Massage'],
-      images: nextImages(3),
+      images: getImages(images, 'dusit-devarana-spa-davao', images),
       isActive: true,
       services: [
         { name: 'Devarana Signature Massage', price: 2500, duration: 90 },
         { name: 'Traditional Thai Massage', price: 1800, duration: 60 },
-        { name: 'Deep Tissue Sports Massage', price: 2000, duration: 60 },
+        { name: 'Deep Tissue Massage', price: 2000, duration: 60 },
         { name: 'Sweet Potato & Lavender Body Scrub', price: 1500, duration: 45 },
         {
           name: 'Couples Harmony Package',
@@ -345,31 +383,9 @@ async function main() {
         },
       ],
     },
+    // --- MASSAGE LUXX SPA BAGUIO ---
     {
-      name: 'Davao Hilot & Wellness Center',
-      slug: 'davao-hilot-wellness-center',
-      category: 'Hilot (Filipino Traditional)',
-      region: 'Region XI',
-      city: 'Davao City',
-      address: '87 C.M. Recto St., Davao City',
-      latitude: 7.0712,
-      longitude: 125.6131,
-      description:
-        'Specializing in traditional Filipino Hilot, this wellness center is a Davao favorite for affordable, authentic healing massage. Our manghihilot use banana leaves, virgin coconut oil, and traditional techniques passed down through generations. We also offer Ventosa cupping and dagdagay foot massage. Walk-ins welcome. Open daily 8AM-10PM.',
-      tags: ['Walk-In Welcome', 'Home Service', 'Senior Discount', 'GCash Accepted'],
-      images: nextImages(2),
-      isActive: true,
-      services: [
-        { name: 'Traditional Hilot Massage', price: 300, duration: 60 },
-        { name: 'Hilot with Banana Leaves', price: 450, duration: 75 },
-        { name: 'Ventosa Cupping Therapy', price: 250, duration: 30 },
-        { name: 'Dagdagay Foot Massage', price: 200, duration: 30 },
-        { name: 'Home Service Hilot', price: 500, duration: 60 },
-      ],
-    },
-    // --- BAGUIO ---
-    {
-      name: 'Massage Luxx Spa Baguio',
+      name: 'Massage Luxx Spa - Baguio City',
       slug: 'massage-luxx-spa-baguio',
       category: 'Combination / Multi-style',
       region: 'CAR',
@@ -378,247 +394,88 @@ async function main() {
       latitude: 16.4119,
       longitude: 120.5933,
       description:
-        "Baguio City's first Japanese Onsen-inspired spa offers a premium wellness experience in the cool mountain air. Massage Luxx combines Japanese bathing traditions with Filipino hospitality. Facilities include infrared sauna, jacuzzi, and clean private rooms. A must-visit after a long drive to the Summer Capital. Open daily 12PM-2AM.",
+        "Baguio City's first Japanese Onsen-inspired spa. Facilities include a warm Jacuzzi, dry sauna, and infrared sauna. Clean private rooms and a relaxing atmosphere in the cool mountain air. Perfect after a long drive to the Summer Capital. Open daily 12PM-2AM. Contact: 0917-705-7398 / 0961-712-0185 / (074) 244-0382.",
       tags: ['Parking Available', 'WiFi Available', 'Couple Massage', 'Credit Card Accepted'],
-      images: nextImages(2),
+      images: getImages(images, 'massage-luxx-spa-baguio', images),
       isActive: true,
       services: [
         { name: 'Signature Combination Massage', price: 600, duration: 60 },
         { name: 'Shiatsu Massage', price: 550, duration: 60 },
         { name: 'Swedish Massage', price: 550, duration: 60 },
+        { name: 'Reflexology', price: 400, duration: 30 },
         { name: 'Organic Bamboo Massage', price: 700, duration: 60 },
-        { name: 'Japanese Atama Head Spa', price: 400, duration: 30 },
       ],
     },
-    {
-      name: 'Casa Vallejo Spa',
-      slug: 'casa-vallejo-spa-baguio',
-      category: 'Swedish Massage',
-      region: 'CAR',
-      city: 'Baguio',
-      address: 'Upper Session Road, beside SM City Baguio, Baguio City',
-      latitude: 16.4131,
-      longitude: 120.5962,
-      description:
-        'Located in the historic Casa Vallejo building on Session Road, this spa combines heritage charm with modern wellness. The cool Baguio climate and pine-scented air enhance every treatment. A perfect way to unwind after exploring the city. Open daily 10AM-10PM.',
-      tags: ['Walk-In Welcome', 'Parking Available', 'WiFi Available', 'Senior Discount'],
-      images: nextImages(2),
-      isActive: true,
-      services: [
-        { name: 'Swedish Relaxation Massage', price: 500, duration: 60 },
-        { name: 'Aromatherapy Massage', price: 650, duration: 60 },
-        { name: 'Foot Reflexology', price: 350, duration: 30 },
-        { name: 'Pine Oil Signature Massage', price: 700, duration: 60 },
-      ],
-    },
-    // --- BORACAY ---
+    // --- TIRTA SPA BORACAY ---
     {
       name: 'Tirta Spa Boracay',
       slug: 'tirta-spa-boracay',
       category: 'Aromatherapy',
       region: 'Region VI',
       city: 'Malay',
-      address: 'Station 1, Beachfront, Boracay Island, Malay, Aklan',
-      latitude: 11.974,
-      longitude: 121.9248,
+      address:
+        'Boracay Tambisaan Jetty Port Rd., Sitio Malabunot, Manoc-Manoc, Boracay Island, Malay, Aklan',
+      latitude: 11.9674,
+      longitude: 121.9249,
       description:
-        'Tirta Spa is a premier beachfront spa on Boracay Island offering luxury treatments with ocean views. Our therapists use premium organic products and blend Balinese, Thai, and Filipino healing traditions. The open-air treatment pavilions with sea breeze create an unforgettable spa experience. By appointment recommended. Open daily 9AM-9PM.',
+        'Winner of the 2025 World Luxury Spa Awards (Best Luxury Healing Spa). Tirta Spa is a premier wellness destination on Boracay Island using natural and locally-sourced ingredients. Integrates traditional Filipino healing with Asian spa practices in a tropical garden setting with open-air treatment pavilions. Founded by En Calvert with a focus on spiritual wellness. Reservation recommended. Open daily 9AM-9PM.',
       tags: ['By Appointment Only', 'Credit Card Accepted', 'Couple Massage', 'WiFi Available'],
-      images: nextImages(3),
+      images: getImages(images, 'tirta-spa-boracay', images),
       isActive: true,
       services: [
-        { name: 'Tirta Signature Aromatherapy', price: 2500, duration: 90 },
-        { name: 'Traditional Filipino Hilot', price: 1800, duration: 60 },
-        { name: 'Balinese Massage', price: 2200, duration: 75 },
-        {
-          name: 'Couples Sunset Package',
-          price: 4000,
-          duration: 90,
-          discount: 10,
-          discountType: 'percentage',
-        },
-        { name: 'After-Sun Aloe Treatment', price: 1200, duration: 45 },
+        { name: 'Tirta Signature Massage', price: 3355, duration: 90 },
+        { name: 'Philippine Hilot with Banana Leaves', price: 2800, duration: 60 },
+        { name: 'Aromatherapy Full Body', price: 3000, duration: 75 },
+        { name: "Couple's Head-to-Toe Relaxing Massage", price: 11600, duration: 120 },
+        { name: 'Body Polish', price: 2750, duration: 45 },
+        { name: 'Body Wrap', price: 3000, duration: 60 },
       ],
     },
-    // --- ILOILO ---
+    // --- REIGN SPA ANGELES CITY ---
     {
-      name: 'Daluy Spa Iloilo',
-      slug: 'daluy-spa-iloilo',
-      category: 'Hilot (Filipino Traditional)',
-      region: 'Region VI',
-      city: 'Iloilo City',
-      address: 'Smallville Complex, Mandurriao, Iloilo City',
-      latitude: 10.7133,
-      longitude: 122.5572,
-      description:
-        'Daluy Spa celebrates the rich tradition of Ilonggo healing through its signature Daluy Hilot massage. Using locally-sourced virgin coconut oil and traditional techniques, our therapists provide a deeply rooted Filipino wellness experience. The crown jewel is our 90-minute Daluy Hilot Signature Massage. Open daily 11AM-11PM.',
-      tags: ['Walk-In Welcome', 'Parking Available', 'GCash Accepted', 'Couple Massage'],
-      images: nextImages(2),
-      isActive: true,
-      services: [
-        { name: 'Daluy Hilot Signature Massage', price: 2200, duration: 90 },
-        { name: 'Traditional Hilot', price: 600, duration: 60 },
-        { name: 'Swedish Massage', price: 550, duration: 60 },
-        { name: 'Premium Foot Spa with Pedicure', price: 420, duration: 45 },
-      ],
-    },
-    // --- PAMPANGA ---
-    {
-      name: 'Reign Spa Angeles City',
+      name: 'Reign Spa',
       slug: 'reign-spa-angeles-city',
       category: 'Combination / Multi-style',
       region: 'Region III',
       city: 'Angeles',
-      address: 'Don Juico Ave., Angeles City, Pampanga',
+      address: '1016 Teodoro St., Sta. Maria 1 Village, Balibago, Angeles City, Pampanga 2009',
       latitude: 15.1449,
       longitude: 120.5887,
       description:
-        'With over 20 years of expertise, Reign Spa is the premier massage destination in Angeles City. Popular with expats near Clark Freeport Zone, we offer Swedish, Shiatsu, Thai, and traditional Hilot massages in clean, air-conditioned facilities. Our experienced therapists and affordable prices keep guests coming back. Open daily 10AM-12MN.',
+        'A living legacy of love, authentic Filipino hospitality, and world-class massage expertise perfected over two decades since 2004. Offering Swedish, Shiatsu, Thai, and traditional Hilot massages in a warm, elegant environment. Popular with both locals and tourists near Clark Freeport Zone. Contact: 0921-213-1111 / thereignspa@gmail.com.',
       tags: ['Walk-In Welcome', 'Parking Available', 'WiFi Available', 'Credit Card Accepted'],
-      images: nextImages(2),
+      images: getImages(images, 'reign-spa-angeles-city', images),
       isActive: true,
       services: [
         { name: 'Swedish Massage', price: 450, duration: 60 },
         { name: 'Shiatsu Massage', price: 450, duration: 60 },
         { name: 'Thai Massage', price: 500, duration: 60 },
         { name: 'Hilot Filipino Massage', price: 400, duration: 60 },
-        {
-          name: 'Combination Massage',
-          price: 600,
-          duration: 90,
-          discount: 50,
-          discountType: 'fixed',
-        },
+        { name: 'Thai Foot Massage', price: 350, duration: 60 },
       ],
     },
+    // --- NUAT THAI MAKATI ---
     {
-      name: 'Citronnelle Spa & Café',
-      slug: 'citronnelle-spa-angeles',
-      category: 'Combination / Multi-style',
-      region: 'Region III',
-      city: 'Angeles',
-      address: 'Unit 5/6, 2nd Floor, BNK Bldg, Friendship Hi-way, Anunas, Angeles City',
-      latitude: 15.1678,
-      longitude: 120.5541,
-      description:
-        'Citronnelle Spa combines an authentic Moroccan bath experience with a cozy café in Angeles City. Their signature Moroccan Bath Package includes a body scrub, 1-hour massage, scalp treatment, and steam bath. A unique wellness concept near Clark that has been a local favorite for years. Open Mon-Sun 10AM-1AM.',
-      tags: ['Parking Available', 'WiFi Available', 'GCash Accepted', 'Couple Massage'],
-      images: nextImages(2),
-      isActive: true,
-      services: [
-        { name: 'Moroccan Bath Package', price: 999, duration: 120 },
-        { name: 'Full Body Massage', price: 500, duration: 60 },
-        { name: 'Body Scrub', price: 400, duration: 30 },
-        {
-          name: 'Couple Spa Package',
-          price: 1800,
-          duration: 120,
-          discount: 200,
-          discountType: 'fixed',
-        },
-      ],
-    },
-    // --- LAGUNA ---
-    {
-      name: 'Calamba Hot Spring Spa',
-      slug: 'calamba-hot-spring-spa',
-      category: 'Hot Stone',
-      region: 'Region IV-A',
-      city: 'Calamba',
-      address: 'National Highway, Pansol, Calamba, Laguna',
-      latitude: 14.1964,
-      longitude: 121.1756,
-      description:
-        'Located in the famous hot spring district of Pansol, Calamba, this spa harnesses the natural mineral-rich waters of Laguna for its treatments. Our hot stone therapy uses volcanic basalt stones heated in natural spring water. Combined with traditional Swedish techniques, it offers a uniquely Filipino wellness experience. Open 24/7.',
-      tags: ['24/7', 'Parking Available', 'Walk-In Welcome', 'Couple Massage'],
-      images: nextImages(2),
-      isActive: true,
-      services: [
-        { name: 'Hot Stone Therapy', price: 800, duration: 60 },
-        { name: 'Mineral Spring Swedish Massage', price: 600, duration: 60 },
-        {
-          name: 'Hot Spring Soak + Massage Package',
-          price: 1000,
-          duration: 90,
-          discount: 15,
-          discountType: 'percentage',
-        },
-        { name: 'Volcanic Mud Body Wrap', price: 700, duration: 45 },
-      ],
-    },
-    // --- TAGAYTAY ---
-    {
-      name: 'Nurture Wellness Village Tagaytay',
-      slug: 'nurture-wellness-village-tagaytay',
-      category: 'Hilot (Filipino Traditional)',
-      region: 'Region IV-A',
-      city: 'Tagaytay',
-      address: 'Purok 3, Barangay Maitim II West, Tagaytay City, Cavite',
-      latitude: 14.1153,
-      longitude: 120.9621,
-      description:
-        'Nurture Wellness Village is a sprawling spa resort in the cool highlands of Tagaytay, dedicated to preserving and promoting Filipino healing traditions. Our Hilot treatments use locally-grown herbs and organic coconut oil. The lush gardens, cool mountain air, and traditional nipa hut treatment rooms make this a destination spa experience. By appointment. Open daily 8AM-8PM.',
-      tags: ['By Appointment Only', 'Parking Available', 'Female Therapist', 'Couple Massage'],
-      images: nextImages(3),
-      isActive: true,
-      services: [
-        { name: 'Traditional Hilot Healing', price: 800, duration: 60 },
-        { name: 'Hilot with Herbal Wrap', price: 1200, duration: 90 },
-        { name: 'Dagdagay Bamboo Foot Massage', price: 500, duration: 30 },
-        {
-          name: 'Couples Garden Hilot',
-          price: 2000,
-          duration: 90,
-          discount: 200,
-          discountType: 'fixed',
-        },
-        { name: 'Prenatal Hilot', price: 900, duration: 60 },
-      ],
-    },
-    // --- MANILA ---
-    {
-      name: 'Crown Garden Spa Ermita',
-      slug: 'crown-garden-spa-ermita',
-      category: 'Combination / Multi-style',
+      name: 'Nuat Thai - Makati',
+      slug: 'nuat-thai-makati',
+      category: 'Thai Massage',
       region: 'NCR',
-      city: 'Manila',
-      address: 'M. Adriatico St., Ermita, Manila',
-      latitude: 14.5763,
-      longitude: 120.9847,
+      city: 'Makati',
+      address: 'Unit GFC-4, Classica Tower, 114 H.V. Dela Costa St., Makati',
+      latitude: 14.56,
+      longitude: 121.023,
       description:
-        'Crown Garden Spa in Ermita is a well-established Manila spa offering a comprehensive menu of massage and body scrub services. From their signature Crown Garden massage to Swedish, Shiatsu, Thai, and aromatherapy, there is something for everyone. Their body scrub options include chocolate, coffee, sea salt, green tea, and vanilla whitening. Open 24/7.',
-      tags: ['24/7', 'Walk-In Welcome', 'Credit Card Accepted', 'GCash Accepted'],
-      images: nextImages(2),
+        'The Makati branch of Nuat Thai, one of the largest massage franchises in the Philippines. Affordable Thai-style massages in a clean, professional setting. A great option for a quick pick-me-up during a busy workday in Makati CBD.',
+      tags: ['Walk-In Welcome', 'GCash Accepted', 'Male Therapist', 'Female Therapist'],
+      images: getImages(images, 'nuat-thai-makati', images),
       isActive: true,
       services: [
-        { name: 'Crown Garden Signature Massage', price: 550, duration: 60 },
+        { name: 'Dry Thai Massage', price: 250, duration: 60 },
+        { name: 'Foot Reflexology', price: 250, duration: 60 },
         { name: 'Swedish Massage', price: 500, duration: 60 },
-        { name: 'Shiatsu Massage', price: 500, duration: 60 },
-        { name: 'Aromatherapy Massage', price: 650, duration: 60 },
-        {
-          name: 'Coffee Body Scrub + Massage',
-          price: 800,
-          duration: 90,
-          discount: 10,
-          discountType: 'percentage',
-        },
-        { name: 'Vanilla Whitening Body Scrub', price: 600, duration: 45 },
+        { name: 'Aromatherapy Massage', price: 550, duration: 60 },
+        { name: 'Hot Oil Massage', price: 550, duration: 60 },
       ],
-    },
-    // --- Inactive listing ---
-    {
-      name: 'Serenity Spa BGC (Temporarily Closed)',
-      slug: 'serenity-spa-bgc-closed',
-      category: 'Aromatherapy',
-      region: 'NCR',
-      city: 'Taguig',
-      address: 'High Street South Block, BGC, Taguig City',
-      description:
-        'Temporarily closed for renovation. Reopening soon with expanded treatment rooms and new wellness packages. Follow our social media for updates.',
-      tags: ['Credit Card Accepted', 'WiFi Available'],
-      images: [images[0]],
-      isActive: false,
-      services: [{ name: 'Aromatherapy Signature Massage', price: 1200, duration: 60 }],
     },
   ];
 
@@ -639,7 +496,7 @@ async function main() {
     });
   }
 
-  console.log(`\nSeeded ${listings.length} listings with real data and images!`);
+  console.log(`\nSeeded ${listings.length} listings with real data and Google Places photos!`);
 }
 
 main()

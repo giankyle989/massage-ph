@@ -1,13 +1,13 @@
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { randomUUID } from 'crypto';
 import * as https from 'https';
-import * as http from 'http';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
-// Load env
 dotenv.config({ path: path.resolve(__dirname, '../.env.local') });
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
+const GOOGLE_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!;
 
 const s3 = new S3Client({
   region: process.env.AWS_S3_REGION!,
@@ -17,35 +17,19 @@ const s3 = new S3Client({
   },
 });
 
-function downloadImage(url: string): Promise<Buffer> {
+function httpsGet(url: string): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    const client = url.startsWith('https') ? https : http;
-    const request = (targetUrl: string) => {
-      client
-        .get(targetUrl, { headers: { 'User-Agent': 'MassagePH-Seeder/1.0' } }, (res) => {
-          // Follow redirects
+    const doRequest = (targetUrl: string, redirectCount = 0) => {
+      if (redirectCount > 5) return reject(new Error('Too many redirects'));
+      https
+        .get(targetUrl, (res) => {
           if (
             res.statusCode &&
             res.statusCode >= 300 &&
             res.statusCode < 400 &&
             res.headers.location
           ) {
-            const redirectUrl = res.headers.location.startsWith('http')
-              ? res.headers.location
-              : new URL(res.headers.location, targetUrl).toString();
-            const redirectClient = redirectUrl.startsWith('https') ? https : http;
-            redirectClient
-              .get(
-                redirectUrl,
-                { headers: { 'User-Agent': 'MassagePH-Seeder/1.0' } },
-                (redirectRes) => {
-                  const chunks: Buffer[] = [];
-                  redirectRes.on('data', (chunk: Buffer) => chunks.push(chunk));
-                  redirectRes.on('end', () => resolve(Buffer.concat(chunks)));
-                  redirectRes.on('error', reject);
-                }
-              )
-              .on('error', reject);
+            doRequest(res.headers.location, redirectCount + 1);
             return;
           }
           const chunks: Buffer[] = [];
@@ -55,7 +39,7 @@ function downloadImage(url: string): Promise<Buffer> {
         })
         .on('error', reject);
     };
-    request(url);
+    doRequest(url);
   });
 }
 
@@ -76,67 +60,113 @@ async function uploadToS3(buffer: Buffer, contentType: string): Promise<string> 
   return `https://${process.env.AWS_S3_BUCKET}.s3.${process.env.AWS_S3_REGION}.amazonaws.com/${key}`;
 }
 
-// Free stock images from Unsplash (massage/spa/wellness themed)
-const IMAGE_SOURCES = [
-  // Spa/massage interiors and scenes
-  'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&q=80', // spa massage
-  'https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=800&q=80', // massage therapy
-  'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=800&q=80', // spa setting
-  'https://images.unsplash.com/photo-1540555700478-4be289fbec6d?w=800&q=80', // wellness spa
-  'https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800&q=80', // spa candles
-  'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=800&q=80', // massage oils
-  'https://images.unsplash.com/photo-1596178060671-7a80dc8059ea?w=800&q=80', // spa treatment
-  'https://images.unsplash.com/photo-1470259078422-826894b933aa?w=800&q=80', // relaxation
-  'https://images.unsplash.com/photo-1591343395082-e120087004b4?w=800&q=80', // hot stone
-  'https://images.unsplash.com/photo-1552693673-1bf958298935?w=800&q=80', // foot massage
-  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80', // yoga/wellness
-  'https://images.unsplash.com/photo-1600334129128-685c5582fd35?w=800&q=80', // spa interior
-  'https://images.unsplash.com/photo-1545205597-3d9d02c29597?w=800&q=80', // meditation
-  'https://images.unsplash.com/photo-1559599101-f09722fb4948?w=800&q=80', // aromatherapy
-  'https://images.unsplash.com/photo-1531299204812-e6d44d9a185c?w=800&q=80', // skincare/beauty
-  'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=800&q=80', // spa pool
-  'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&q=80', // spa room
-  'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&q=80', // face treatment
-  'https://images.unsplash.com/photo-1611073615830-10be9b0389a8?w=800&q=80', // massage back
-  'https://images.unsplash.com/photo-1609840113055-87680b1d9200?w=800&q=80', // spa towels
-  'https://images.unsplash.com/photo-1549576490-b0b4831ef60a?w=800&q=80', // couple yoga
-  'https://images.unsplash.com/photo-1540324155974-7523202daa3f?w=800&q=80', // pool/wellness
-  'https://images.unsplash.com/photo-1583416750470-965b2707b355?w=800&q=80', // spa products
-  'https://images.unsplash.com/photo-1515461024012-0cabcca4de93?w=800&q=80', // bamboo spa
+async function findPlaceId(query: string): Promise<string | null> {
+  const url = `https://maps.googleapis.com/maps/api/place/findplacefromtext/json?input=${encodeURIComponent(query)}&inputtype=textquery&fields=place_id&key=${GOOGLE_API_KEY}`;
+  const buf = await httpsGet(url);
+  const data = JSON.parse(buf.toString());
+  return data.candidates?.[0]?.place_id ?? null;
+}
+
+async function getPlacePhotos(placeId: string): Promise<string[]> {
+  const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=photos&key=${GOOGLE_API_KEY}`;
+  const buf = await httpsGet(url);
+  const data = JSON.parse(buf.toString());
+  const photos = data.result?.photos ?? [];
+  return photos.map((p: { photo_reference: string }) => p.photo_reference);
+}
+
+async function downloadPlacePhoto(photoRef: string, maxWidth = 800): Promise<Buffer> {
+  const url = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=${maxWidth}&photo_reference=${photoRef}&key=${GOOGLE_API_KEY}`;
+  return httpsGet(url);
+}
+
+export interface BusinessImages {
+  [slug: string]: string[];
+}
+
+// Each entry: [slug, Google Maps search query, number of photos to fetch]
+const BUSINESSES: [string, string, number][] = [
+  ['breeze-oriental-spa-bgc', 'Breeze Oriental Spa & Massage BGC Taguig', 3],
+  ['breeze-oriental-spa-makati', 'Breeze Oriental Spa & Massage Makati', 3],
+  ['the-mandara-spa-bgc', 'The Mandara Spa BGC Taguig', 3],
+  ['chang-thai-massage-poblacion', 'Chang Thai Massage Poblacion Makati', 2],
+  ['celebrity-spiral-spa-qc', 'Celebrity Spiral Spa Quezon City', 2],
+  ['thai-royale-spa-tomas-morato', 'Thai Royale Spa Tomas Morato Quezon City', 2],
+  ['nuat-thai-cebu', 'Nuat Thai Cebu City', 2],
+  ['tree-shade-spa-cebu', 'Tree Shade Spa Cebu', 3],
+  ['body-and-sole-spa-cebu', 'Body & Sole Spa Cebu City', 2],
+  ['big-apple-express-spa-bgc', 'Big Apple Express Spa BGC Taguig', 2],
+  ['dusit-devarana-spa-davao', 'Dusit Thani Devarana Spa Davao', 3],
+  ['tirta-spa-boracay', 'Tirta Spa Boracay', 3],
+  ['massage-luxx-spa-baguio', 'Massage Luxx Spa Baguio', 2],
+  ['reign-spa-angeles-city', 'Reign Spa Angeles City Pampanga', 2],
+  ['nuat-thai-makati', 'Nuat Thai Makati', 2],
+  ['nature-wellness-lapu-lapu', 'Nature Wellness Massage Spa Lapu-Lapu Cebu', 2],
+  ['cedar-wellness-spa-qc', 'Cedar Wellness Spa Quezon City', 2],
 ];
 
-export async function downloadAndUploadImages(): Promise<string[]> {
-  const uploadedUrls: string[] = [];
+export async function downloadBusinessImages(): Promise<BusinessImages> {
+  const result: BusinessImages = {};
+  let totalUploaded = 0;
 
-  console.log(`Downloading and uploading ${IMAGE_SOURCES.length} images to S3...`);
+  console.log(`Fetching photos for ${BUSINESSES.length} businesses via Google Places API...\n`);
 
-  for (let i = 0; i < IMAGE_SOURCES.length; i++) {
-    const url = IMAGE_SOURCES[i];
+  for (const [slug, query, count] of BUSINESSES) {
+    console.log(`[${slug}] Searching: "${query}"`);
     try {
-      console.log(`  [${i + 1}/${IMAGE_SOURCES.length}] Downloading...`);
-      const buffer = await downloadImage(url);
-      if (buffer.length < 1000) {
-        console.log(`    Skipped (too small: ${buffer.length} bytes)`);
+      const placeId = await findPlaceId(query);
+      if (!placeId) {
+        console.log(`  ⚠ Not found on Google Maps, skipping`);
+        result[slug] = [];
         continue;
       }
-      const s3Url = await uploadToS3(buffer, 'image/jpeg');
-      uploadedUrls.push(s3Url);
-      console.log(`    Uploaded: ${s3Url}`);
+
+      const photoRefs = await getPlacePhotos(placeId);
+      if (photoRefs.length === 0) {
+        console.log(`  ⚠ No photos available`);
+        result[slug] = [];
+        continue;
+      }
+
+      const urls: string[] = [];
+      const toFetch = Math.min(count, photoRefs.length);
+      for (let i = 0; i < toFetch; i++) {
+        try {
+          const buffer = await downloadPlacePhoto(photoRefs[i]);
+          if (buffer.length < 5000) {
+            console.log(`  ⚠ Photo ${i + 1} too small (${buffer.length}b), skipping`);
+            continue;
+          }
+          const s3Url = await uploadToS3(buffer, 'image/jpeg');
+          urls.push(s3Url);
+          totalUploaded++;
+          console.log(
+            `  ✓ Photo ${i + 1}/${toFetch} uploaded (${(buffer.length / 1024).toFixed(0)}KB)`
+          );
+        } catch (err) {
+          console.log(`  ✗ Photo ${i + 1} failed: ${(err as Error).message}`);
+        }
+      }
+      result[slug] = urls;
     } catch (err) {
-      console.error(`    Failed: ${(err as Error).message}`);
+      console.log(`  ✗ Error: ${(err as Error).message}`);
+      result[slug] = [];
     }
   }
 
-  console.log(`\nSuccessfully uploaded ${uploadedUrls.length} images`);
-  return uploadedUrls;
+  console.log(
+    `\nDone! Uploaded ${totalUploaded} photos for ${Object.keys(result).length} businesses`
+  );
+  return result;
 }
 
-// Run standalone
 if (require.main === module) {
-  downloadAndUploadImages()
-    .then((urls) => {
-      console.log('\nAll URLs:');
-      urls.forEach((u) => console.log(u));
+  downloadBusinessImages()
+    .then((images) => {
+      console.log('\nResults:');
+      for (const [slug, urls] of Object.entries(images)) {
+        console.log(`  ${slug}: ${urls.length} photos`);
+      }
     })
     .catch((err) => {
       console.error(err);
