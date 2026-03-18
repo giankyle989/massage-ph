@@ -44,12 +44,11 @@ jobs:
 
       - name: Package build artifacts
         run: |
-          mkdir -p deploy
-          # Standalone server
-          cp -r .next/standalone/* deploy/
-          # Static assets (standalone doesn't include these)
-          mkdir -p deploy/.next/static
-          cp -r .next/static/* deploy/.next/static/
+          # Start with the standalone output (includes server.js + .next with server code)
+          cp -r .next/standalone deploy
+          # Add static assets (not included in standalone)
+          cp -r .next/static deploy/.next/static
+          # Add public assets
           cp -r public deploy/public
           # Prisma files for migrations
           cp -r prisma deploy/prisma
@@ -95,8 +94,8 @@ jobs:
 
             cd $APP_DIR
 
-            # Install only production deps needed by standalone
-            npm ci --omit=dev 2>&1 | tail -3
+            # Install prisma CLI for migrations (standalone bundles everything else)
+            npm install --no-save prisma@latest @prisma/client@latest 2>&1 | tail -3
 
             # Run database migrations
             npx prisma generate
