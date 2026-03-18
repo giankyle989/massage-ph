@@ -33,7 +33,7 @@ async function main() {
       description:
         'Premium Thai massage experience in the heart of Makati. Open daily from 10AM to 10PM. Contact: 0917-123-4567.',
       tags: ['Parking Available', 'WiFi Available', 'Credit Card Accepted', 'GCash Accepted'],
-      images: ['https://placehold.co/800x600/e2e8f0/64748b?text=Zen+Thai+Spa'],
+      images: ['https://massageph-s3.s3.ap-southeast-1.amazonaws.com/listings/zen-thai-spa.jpg'],
       isActive: true,
       services: [
         { name: 'Traditional Thai Massage', price: 500, duration: 60 },
@@ -59,7 +59,7 @@ async function main() {
       description:
         'Authentic Filipino Hilot massage using traditional techniques. Walk-ins welcome! Call us at 0918-765-4321.',
       tags: ['Walk-In Welcome', 'Home Service', 'Senior Discount', 'GCash Accepted'],
-      images: ['https://placehold.co/800x600/e2e8f0/64748b?text=Hilot+Healing+Hands'],
+      images: ['https://massageph-s3.s3.ap-southeast-1.amazonaws.com/listings/hilot-healing.jpg'],
       isActive: true,
       services: [
         { name: 'Traditional Hilot', price: 400, duration: 60 },
@@ -84,7 +84,7 @@ async function main() {
       description:
         'Japanese-style Shiatsu massage in Cebu. By appointment only. Open Mon-Sat 9AM-8PM. Contact: 0919-888-7777.',
       tags: ['By Appointment Only', 'Parking Available', 'Couple Massage'],
-      images: ['https://placehold.co/800x600/e2e8f0/64748b?text=Cebu+Shiatsu+Center'],
+      images: ['https://massageph-s3.s3.ap-southeast-1.amazonaws.com/listings/cebu-shiatsu.jpg'],
       isActive: true,
       services: [
         { name: 'Full Body Shiatsu', price: 600, duration: 60 },
@@ -104,7 +104,7 @@ async function main() {
       description:
         'Relaxing Swedish massage in a peaceful setting. Open 24/7. Contact: 0920-555-1234.',
       tags: ['24/7', 'WiFi Available', 'Female Therapist', 'Male Therapist'],
-      images: ['https://placehold.co/800x600/e2e8f0/64748b?text=Swedish+Touch+Calamba'],
+      images: ['https://massageph-s3.s3.ap-southeast-1.amazonaws.com/listings/swedish-touch.jpg'],
       isActive: true,
       services: [
         { name: 'Classic Swedish Massage', price: 550, duration: 60 },
@@ -130,7 +130,7 @@ async function main() {
       description:
         'Specializing in deep tissue and sports massage. Perfect for athletes and active individuals. Contact: 0921-333-9999.',
       tags: ['Walk-In Welcome', 'Parking Available', 'Student Discount', 'Wheelchair Accessible'],
-      images: ['https://placehold.co/800x600/e2e8f0/64748b?text=Davao+Deep+Tissue'],
+      images: ['https://massageph-s3.s3.ap-southeast-1.amazonaws.com/listings/davao-deep.jpg'],
       isActive: true,
       services: [
         { name: 'Deep Tissue Full Body', price: 650, duration: 60 },
@@ -154,7 +154,7 @@ async function main() {
       address: '100 BGC, Taguig City',
       description: 'Currently closed for renovation. Will reopen soon!',
       tags: ['Credit Card Accepted'],
-      images: ['https://placehold.co/800x600/e2e8f0/64748b?text=Closed+For+Renovation'],
+      images: ['https://massageph-s3.s3.ap-southeast-1.amazonaws.com/listings/closed-spa.jpg'],
       isActive: false,
       services: [{ name: 'Aromatherapy Massage', price: 800, duration: 60 }],
     },
